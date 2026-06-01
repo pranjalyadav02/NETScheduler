@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UGC NET Geography – 90 Day Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1117;
+    --bg2: #161b27;
+    --bg3: #1e2535;
+    --border: #2a3348;
+    --accent: #4f9cf9;
+    --accent2: #34d399;
+    --accent3: #f59e0b;
+    --red: #f87171;
+    --text: #e8edf5;
+    --text2: #8898b8;
+    --text3: #4a5568;
+    --card: #1a2236;
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --gray: #374151;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+  h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+
+  /* NAV */
+  .nav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
+  .nav-brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; color: var(--accent); padding: 14px 12px 14px 0; border-right: 1px solid var(--border); margin-right: 8px; white-space: nowrap; }
+  .nav-brand span { color: var(--accent2); }
+  .nav-tab { padding: 14px 16px; font-size: 13px; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; color: var(--text2); transition: all .2s; white-space: nowrap; }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* LAYOUT */
+  .tab-content { display: none; padding: 24px; max-width: 1300px; margin: 0 auto; }
+  .tab-content.active { display: block; }
+
+  /* CARDS */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .card-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--text2); margin-bottom: 8px; }
+  .card-value { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--text); }
+  .card-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media(max-width: 900px) { .grid4 { grid-template-columns: repeat(2,1fr); } .grid3 { grid-template-columns: 1fr 1fr; } }
+  @media(max-width: 600px) { .grid2,.grid3,.grid4 { grid-template-columns: 1fr; } .nav { gap: 0; } .nav-tab { padding: 12px 10px; font-size: 12px; } }
+
+  /* PROGRESS BAR */
+  .pbar-wrap { margin: 8px 0; }
+  .pbar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 5px; }
+  .pbar { height: 7px; background: var(--bg3); border-radius: 99px; overflow: hidden; }
+  .pbar-fill { height: 100%; border-radius: 99px; transition: width .4s; background: var(--accent); }
+  .pbar-fill.green { background: var(--green); }
+  .pbar-fill.amber { background: var(--accent3); }
+
+  /* BUTTONS */
+  .btn { padding: 8px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all .2s; font-family: 'DM Sans', sans-serif; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #3b82f6; }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-outline { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  /* TAG */
+  .tag { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+  .tag-blue { background: rgba(59,130,246,.18); color: #93c5fd; }
+  .tag-green { background: rgba(34,197,94,.18); color: #86efac; }
+  .tag-amber { background: rgba(245,158,11,.18); color: #fcd34d; }
+  .tag-red { background: rgba(248,113,113,.18); color: #fca5a5; }
+  .tag-gray { background: rgba(100,116,139,.18); color: #94a3b8; }
+
+  /* SECTION HEADER */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
+  .section-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
+
+  /* ===================== STUDY PLAN ===================== */
+  .week-selector { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .select-styled { background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 8px 14px; border-radius: var(--radius-sm); font-size: 14px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+  .select-styled:focus { outline: none; border-color: var(--accent); }
+
+  .day-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 16px; }
+  .day-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: transform .2s, border-color .2s; cursor: pointer; }
+  .day-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .day-card.done { border-color: rgba(34,197,94,.6); }
+  .day-card.today { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(79,156,249,.3); }
+  .day-card-head { padding: 14px 16px; background: var(--bg3); display: flex; justify-content: space-between; align-items: center; }
+  .day-num { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text2); }
+  .day-card-body { padding: 14px 16px; }
+  .day-topic { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .day-subtopic { font-size: 12px; color: var(--text2); margin-bottom: 10px; line-height: 1.5; }
+  .day-targets { font-size: 12px; color: var(--text2); }
+  .day-targets li { margin-bottom: 3px; padding-left: 14px; position: relative; }
+  .day-targets li::before { content: '→'; position: absolute; left: 0; color: var(--accent); }
+  .day-schedule { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+  .schedule-row { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+  .schedule-time { color: var(--accent3); font-weight: 600; white-space: nowrap; min-width: 120px; }
+  .schedule-task { color: var(--text2); }
+
+  /* ===================== PROGRESS TAB ===================== */
+  .progress-week-header { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color .2s; }
+  .progress-week-header:hover { border-color: var(--accent); }
+  .progress-week-days { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px; }
+  .progress-day-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .progress-day-row:last-child { border-bottom: none; }
+  .progress-day-label { font-weight: 600; font-size: 13px; min-width: 60px; color: var(--text); }
+  .progress-day-topic { font-size: 12px; color: var(--text2); flex: 1; min-width: 120px; }
+  .checkbox-group { display: flex; gap: 12px; flex-wrap: wrap; }
+  .check-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text2); cursor: pointer; }
+  .check-item input[type=checkbox] { accent-color: var(--green); width: 14px; height: 14px; cursor: pointer; }
+  .week-status { font-size: 12px; font-weight: 600; }
+
+  /* STATS ROW */
+  .stats-bar { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+  @media(max-width:700px) { .stats-bar { grid-template-columns: repeat(2,1fr); } }
+  .stat-chip { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; }
+  .stat-chip-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  .stat-chip-val { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: var(--text); }
+
+  /* ===================== CALENDAR ===================== */
+  .cal-month-label { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .08em; margin: 18px 0 8px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; margin-bottom: 20px; }
+  @media(max-width: 768px) { .cal-grid { grid-template-columns: repeat(5, 1fr); } }
+  .cal-cell { aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: 600; transition: all .15s; position: relative; border: 1px solid transparent; }
+  .cal-cell.pending { background: var(--bg3); color: var(--text2); }
+  .cal-cell.pending:hover { border-color: var(--accent); color: var(--text); }
+  .cal-cell.done { background: rgba(34,197,94,.2); color: var(--green); border-color: rgba(34,197,94,.3); }
+  .cal-cell.today-cal { background: rgba(59,130,246,.25); color: #93c5fd; border-color: var(--blue); }
+  .cal-cell .cal-unit { font-size: 8px; color: var(--text2); margin-top: 4px; text-transform: uppercase; font-weight: 600; max-width: 90%; overflow: hidden; text-overflow: ellipsis; }
+  .cal-legend { display: flex; gap: 16px; margin: 12px 0; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
+  .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
+
+  /* DAY MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 560px; max-height: 85vh; overflow-y: auto; padding: 24px; }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .modal-close { background: var(--bg3); border: none; color: var(--text2); width: 30px; height: 30px; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+  .modal-section { margin-bottom: 16px; }
+  .modal-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text2); margin-bottom: 8px; }
+  .notes-area { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); padding: 10px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; resize: vertical; min-height: 100px; }
+  .notes-area:focus { outline: none; border-color: var(--accent); }
+  .hours-input { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); padding: 8px 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; width: 100px; }
+  .hours-input:focus { outline: none; border-color: var(--accent); }
+
+  /* ===================== TESTS ===================== */
+  .test-form { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 20px; }
+  .form-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .form-input { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); padding: 8px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; flex: 1; min-width: 120px; }
+  .form-input:focus { outline: none; border-color: var(--accent); }
+  .test-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .test-table th { text-align: left; padding: 10px 14px; background: var(--bg3); color: var(--text2); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--border); }
+  .test-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
+  .test-table tr:last-child td { border-bottom: none; }
+  .test-table tr:hover td { background: var(--bg3); }
+
+  /* EXPORT */
+  .export-section { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+  /* REVISION */
+  .rev-unit { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 10px; }
+  .rev-unit-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  .rev-checks { display: flex; gap: 16px; flex-wrap: wrap; }
+
+  /* Week label in plan */
+  .week-banner { background: linear-gradient(135deg, rgba(79,156,249,.12), rgba(52,211,153,.08)); border: 1px solid rgba(79,156,249,.25); border-radius: var(--radius); padding: 12px 18px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .week-banner-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
+  .week-banner-meta { font-size: 12px; color: var(--text2); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--green); color: #fff; padding: 10px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; z-index: 300; display: none; animation: slideup .3s; }
+  @keyframes slideup { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  /* BACKUP TAB */
+  .backup-info { display:flex; align-items:center; gap:10px; border-radius:var(--radius); padding:14px 18px; margin-bottom:20px; font-size:13px; font-weight:500; border:1px solid var(--border); background:rgba(79,156,249,.08); color:var(--text2); line-height:1.6; }
+  .backup-info span:first-child { font-size:20px; }
+  .backup-actions { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:24px; }
+  .backup-actions .btn { padding:12px 24px; font-size:14px; }
+  .file-drop { border:2px dashed var(--border); border-radius:var(--radius); padding:32px; text-align:center; color:var(--text2); cursor:pointer; transition:all .2s; }
+  .file-drop:hover, .file-drop.drag-over { border-color:var(--accent); background:rgba(79,156,249,.06); }
+  .file-drop input { display:none; }
+  .danger-zone { border:1px solid var(--red); border-radius:var(--radius); padding:18px; margin-top:24px; background:rgba(248,113,113,.05); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">NET GEO <span>90</span></div>
+  <div class="nav-tab active" onclick="showTab('dashboard')">📊 Dashboard</div>
+  <div class="nav-tab" onclick="showTab('plan')">📅 Study Plan</div>
+  <div class="nav-tab" onclick="showTab('progress')">✅ Progress</div>
+  <div class="nav-tab" onclick="showTab('calendar')">🗓 Calendar</div>
+  <div class="nav-tab" onclick="showTab('tests')">📝 Tests</div>
+  <div class="nav-tab" onclick="showTab('revision')">🔁 Revision</div>
+  <div class="nav-tab" onclick="showTab('backup')">📦 Backup</div>
+</nav>
+
+<!-- ===================== DASHBOARD ===================== -->
+<div id="tab-dashboard" class="tab-content active">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Study Dashboard</div>
+      <div class="section-sub" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+        UGC NET Geography · Starting 
+        <input type="date" id="start-date-picker" style="background:var(--bg3); border:1px solid var(--border); color:var(--text); border-radius:4px; padding:2px 6px; font-size:12px; font-family:'DM Sans';" onchange="changeStartDate(this.value)"> 
+        · 90 Days
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="font-size:12px; color:var(--text2)">Current Study Day:</div>
+      <select class="select-styled" id="current-day-select" style="padding:4px 8px; font-size:12px;" onchange="changeCurrentDay(this.value)">
+        <!-- Day options generated by JS -->
+      </select>
+      <div id="today-badge" class="tag tag-blue">Day 1 of 90</div>
+    </div>
+  </div>
+
+  <div class="grid4" style="margin-bottom:20px" id="stat-cards">
+    <div class="card"><div class="card-title">Completed Days</div><div class="card-value" id="d-completed">0</div><div class="card-sub">out of 90 days</div></div>
+    <div class="card"><div class="card-title">Remaining Days</div><div class="card-value" id="d-remaining">90</div><div class="card-sub">days to go</div></div>
+    <div class="card"><div class="card-title">Current Streak</div><div class="card-value" id="d-streak">0 <span class="streak-fire">🔥</span></div><div class="card-sub">consecutive days</div></div>
+    <div class="card"><div class="card-title">Study Hours</div><div class="card-value" id="d-hours">0</div><div class="card-sub" id="d-hours-averages">Weekly Avg: 0h | Monthly Avg: 0h</div></div>
+  </div>
+
+  <div class="grid3" style="margin-bottom:20px">
+    <div class="chart-wrap">
+      <div class="card-title" style="margin-bottom:14px">Overall Progress</div>
+      <canvas id="chart-pie"></canvas>
+    </div>
+    <div class="chart-wrap">
+      <div class="card-title" style="margin-bottom:14px">Weekly Completion (%)</div>
+      <canvas id="chart-bar"></canvas>
+    </div>
+    <div class="chart-wrap">
+      <div class="card-title" style="margin-bottom:14px">Study Hours Logged</div>
+      <canvas id="chart-hours"></canvas>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title" style="margin-bottom:14px">Unit Progress</div>
+    <div id="unit-progress-dash"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="margin-bottom:14px">Export Data</div>
+    <div class="export-section">
+      <button class="btn btn-outline" onclick="exportCSV()">📥 Export Progress CSV</button>
+      <button class="btn btn-outline" onclick="exportJSON()">📥 Export Full JSON</button>
+      <button class="btn btn-outline" onclick="exportNotes()">📥 Export Notes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== STUDY PLAN ===================== -->
+<div id="tab-plan" class="tab-content">
+  <div class="section-header">
+    <div>
+      <div class="section-title">90-Day Study Plan</div>
+      <div class="section-sub">Syllabus-first · 6–8 hrs/day</div>
+    </div>
+    <div class="week-selector">
+      <select class="select-styled" id="week-select" onchange="renderPlan()">
+        <option value="1">Week 1</option>
+        <option value="2">Week 2</option>
+        <option value="3">Week 3</option>
+        <option value="4">Week 4</option>
+        <option value="5">Week 5</option>
+        <option value="6">Week 6</option>
+        <option value="7">Week 7</option>
+        <option value="8">Week 8</option>
+        <option value="9">Week 9</option>
+        <option value="10">Week 10</option>
+        <option value="11">Week 11</option>
+        <option value="12">Week 12</option>
+        <option value="13">Week 13</option>
+      </select>
+    </div>
+  </div>
+  <div id="plan-week-banner"></div>
+  <div class="day-grid" id="plan-days"></div>
+</div>
+
+<!-- ===================== PROGRESS ===================== -->
+<div id="tab-progress" class="tab-content">
+  <div class="section-header">
+    <div class="section-title">Daily Progress Tracker</div>
+  </div>
+  <div class="stats-bar" id="progress-stats"></div>
+  <div id="progress-weeks"></div>
+</div>
+
+<!-- ===================== CALENDAR ===================== -->
+<div id="tab-calendar" class="tab-content">
+  <div class="section-header">
+    <div class="section-title">90-Day Calendar</div>
+  </div>
+  <div class="cal-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(34,197,94,.5)"></div>Completed</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(59,130,246,.4)"></div>Today</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--bg3)"></div>Pending</div>
+  </div>
+  <div id="cal-container" class="cal-grid"></div>
+</div>
+
+<!-- ===================== TESTS ===================== -->
+<div id="tab-tests" class="tab-content">
+  <div class="section-header"><div class="section-title">Mock Test Tracker</div></div>
+  <div class="test-form">
+    <div class="card-title" style="margin-bottom:12px">Add Test Result</div>
+    <div class="form-row">
+      <input class="form-input" id="t-name" placeholder="Test Name (e.g. Week 4 Unit Test)">
+      <input class="form-input" id="t-date" type="date">
+      <input class="form-input" id="t-score" type="number" placeholder="Score" min="0" max="200">
+      <input class="form-input" id="t-total" type="number" placeholder="Total" value="100">
+    </div>
+    <button class="btn btn-primary" onclick="addTest()">Add Result</button>
+  </div>
+  <div class="grid3" style="margin-bottom:20px">
+    <div class="stat-chip"><div class="stat-chip-label">Average Score</div><div class="stat-chip-val" id="t-avg">—</div></div>
+    <div class="stat-chip"><div class="stat-chip-label">Highest Score</div><div class="stat-chip-val" id="t-high">—</div></div>
+    <div class="stat-chip"><div class="stat-chip-label">Tests Taken</div><div class="stat-chip-val" id="t-count">0</div></div>
+  </div>
+  <div class="chart-wrap" style="margin-bottom:20px">
+    <div class="card-title" style="margin-bottom:14px">Score Trend</div>
+    <canvas id="chart-tests" style="max-height:200px"></canvas>
+  </div>
+  <div class="card" style="overflow-x:auto">
+    <table class="test-table">
+      <thead><tr><th>Test Name</th><th>Date</th><th>Score</th><th>Total</th><th>%</th><th></th></tr></thead>
+      <tbody id="test-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== REVISION ===================== -->
+<div id="tab-revision" class="tab-content">
+  <div class="section-header"><div class="section-title">Revision Tracker</div></div>
+  <div id="rev-units"></div>
+</div>
+
+<!-- DAY MODAL -->
+<div class="modal-overlay" id="day-modal" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800" id="modal-title">Day 1</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:3px" id="modal-date"></div>
+      </div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Topic</div>
+      <div id="modal-topic" style="font-size:15px;font-weight:600;color:var(--text)"></div>
+      <div id="modal-subtopic" style="font-size:12px;color:var(--text2);margin-top:4px"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Targets</div>
+      <ul id="modal-targets" class="day-targets"></ul>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Checklist</div>
+      <div class="checkbox-group" id="modal-checks"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Study Hours Logged</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <input type="number" class="hours-input" id="modal-hours" placeholder="e.g. 7.5" step="0.5" min="0" max="16">
+        <span style="font-size:12px;color:var(--text2)">hours</span>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Notes</div>
+      <textarea class="notes-area" id="modal-notes" placeholder="Write today's notes, key points, formulae..."></textarea>
+    </div>
+    <button class="btn btn-success" style="width:100%;margin-top:8px" onclick="saveModalDay()">💾 Save Day</button>
+  </div>
+</div>
+
+<!-- ===================== BACKUP & RESTORE ===================== -->
+<div id="tab-backup" class="tab-content">
+  <div class="section-header">
+    <div>
+      <div class="section-title">📦 Backup & Restore</div>
+      <div class="section-sub">Export your progress to transfer between devices or keep a safe backup</div>
+    </div>
+  </div>
+
+  <div class="backup-info">
+    <span>💡</span>
+    <span>Your data is saved in your browser’s local storage. To move it to another device or browser, <strong>export</strong> your progress as a JSON file and <strong>import</strong> it on the other device.</span>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-title" style="margin-bottom:6px;">⬆️ Export / Download Backup</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">Downloads a JSON file containing all your progress, tests, revisions, and settings.</p>
+    <div class="backup-actions">
+      <button class="btn btn-primary" onclick="exportBackup()">💾 Export Progress (JSON)</button>
+      <button class="btn btn-outline" onclick="exportCSV()">📄 Export Summary (CSV)</button>
+    </div>
+    <div id="export-stats" style="font-size:12px;color:var(--text2);"></div>
+  </div>
+
+  <!-- IMPORT -->
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-title" style="margin-bottom:6px;">⬇️ Import / Restore Backup</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">Upload a previously exported JSON backup file to restore your progress.</p>
+    <div class="file-drop" id="file-drop" onclick="document.getElementById('import-file').click()">
+      <input type="file" id="import-file" accept=".json" onchange="importBackup(event)">
+      <div style="font-size:28px;margin-bottom:8px;">📂</div>
+      <div style="font-weight:600;margin-bottom:4px;">Click to browse or drag & drop</div>
+      <div style="font-size:12px;">Accepts .json backup files</div>
+    </div>
+    <div id="import-result" style="margin-top:12px;font-size:13px;display:none;"></div>
+  </div>
+
+  <!-- DATA OVERVIEW -->
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-title" style="margin-bottom:10px;">📊 Data Overview</div>
+    <div class="grid3" id="backup-stats"></div>
+  </div>
+
+  <!-- DANGER ZONE -->
+  <div class="danger-zone">
+    <div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:8px;">⚠️ Danger Zone</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">This will permanently delete all your progress from this browser. Make sure you have a backup first!</p>
+    <button class="btn btn-outline" style="color:var(--red);border-color:var(--red);" onclick="resetAllData()">🗑️ Reset All Progress</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Saved!</div>
+
+<script>
+// ============================================================
+// DATA – 90-DAY PLAN (13 weeks syllabus + 1 week PYQ/tests)
+// ============================================================
+let START_DATE = new Date(localStorage.getItem('ngp_start_date') ? JSON.parse(localStorage.getItem('ngp_start_date')) : '2026-06-01');
+const UNITS = [
+  'Geomorphology','Climatology','Oceanography','Environmental Geography',
+  'Population & Settlement','Economic Geography','Political & Cultural Geo',
+  'Geographic Thought','Geographical Techniques','Research Methodology'
+];
+
+// WEEKLY GOALS
+const WEEK_GOALS = [
+  'Geomorphology I – Earth Interior, Continental Drift, Sea Floor Spreading, Plate Tectonics',
+  'Geomorphology II – Weathering, Mass Wasting, Davis & Penck Cycles, Slope Development',
+  'Climatology I – Atmosphere, Insolation, Heat Budget, Temperature, Pressure, Winds',
+  'Climatology II – Humidity, Clouds, Precipitation, Cyclones, Climate Classification',
+  'Oceanography – Ocean Floor, Currents, Tides, Waves, Marine Resources, Salinity',
+  'Environmental Geography – Ecosystems, Biomes, Biodiversity, Env. Issues, Disasters',
+  'Population & Settlement Geography – Distribution, Growth, Migration, Urbanisation, Settlement Patterns',
+  'Economic Geography – Agriculture, Minerals, Energy, Industry, Transport, Trade',
+  'Political & Cultural Geography – State, Territory, Boundaries, Culture, Language, Religion',
+  'Geographic Thought I – Ancient-Medieval, Classical Thinkers, Determinism, Possibilism',
+  'Geographic Thought II – Regional Geography, Quantitative Revolution, Humanism, Post-modernism',
+  'Geographical Techniques – Maps, Surveying, Remote Sensing, GIS, Cartography',
+  'Research Methodology & Statistics – Research Design, Sampling, Data, Statistical Techniques',
+];
+
+const PLAN = [];
+// Build day-by-day plan
+const dayTopics = [
+  // WEEK 1 – Geomorphology I
+  {t:'Introduction to Geomorphology + Continental Drift',s:'Earth interior, Wegener theory, evidences of drift',g:[0],tg:['Understand all evidences of drift','Earth layers diagram','Definition of Geomorphology']},
+  {t:'Sea Floor Spreading',s:'Mid Oceanic Ridge, Harry Hess, Paleomagnetism, Magnetic stripes',g:[0],tg:['Explain how SFS supports drift','Paleomagnetism concept','Create flowchart']},
+  {t:'Plate Tectonic Theory I',s:'Lithosphere, Asthenosphere, Plate Boundaries, Divergent',g:[0],tg:['Draw plate boundary diagrams','Types of plates','Divergent boundary features']},
+  {t:'Plate Tectonic Theory II',s:'Convergent, Transform Faults, Ring of Fire, Plate movements',g:[0],tg:['Earthquake-volcano link','Convergent boundary types','Transform fault examples']},
+  {t:'Endogenic Forces',s:'Diastrophism, Orogenic, Epeirogenic, Sudden vs Slow forces',g:[0],tg:['Make comparison table','Types of diastrophism','Examples of each force']},
+  {t:'Exogenic Forces & Geomorphic Agents',s:'Running water, Wind, Glacier, Groundwater, Waves',g:[0],tg:['All geomorphic agents','Process vs agent difference','Work of each agent']},
+  {t:'Week 1 Revision + MCQ Test',s:'Continental Drift → Exogenic Forces',g:[0],tg:['Complete revision','100 MCQs','Identify weak areas']},
+  // WEEK 2 – Geomorphology II
+  {t:'Weathering – Types & Processes',s:'Mechanical, Chemical, Biological weathering',g:[0],tg:['Differentiate weathering/erosion/denudation','Chemical weathering processes','Comparison chart']},
+  {t:'Chemical Weathering Processes',s:'Oxidation, Carbonation, Hydration, Solution, Hydrolysis',g:[0],tg:['Examples of each process','Real-world landforms','Process diagram']},
+  {t:'Mass Wasting',s:'Mass movement, Falls, Slides, Flows, Creep',g:[0],tg:['Classification chart','Triggering factors','Real disasters examples']},
+  {t:'Davis Geomorphic Cycle',s:'Youth, Mature, Old stages, Peneplain concept',g:[0],tg:['Davis cycle diagram from memory','Peneplain concept','10-mark answer structure']},
+  {t:'Penck\'s Geomorphic Cycle',s:'Uplift & Denudation, Waxing/Uniform/Waning development',g:[0],tg:['Davis vs Penck comparison table','Waxing slope concept','Critique of Davis cycle']},
+  {t:'Slope Development Theories',s:'Davis, Penck, King theories; Parallel retreat, Slope decline',g:[0],tg:['Slope development diagrams','King\'s pediplain concept','Compare 3 theories']},
+  {t:'Week 2 Revision + MCQ Test',s:'Weathering → Slope Development (entire Unit 1)',g:[0],tg:['Complete Unit 1 revision','100 MCQs from Geomorphology','Error analysis']},
+  // WEEK 3 – Climatology I
+  {t:'Atmosphere – Composition & Structure',s:'Layers of atmosphere, gases, significance',g:[1],tg:['Draw atmosphere layers','Ozone layer significance','Composition proportions']},
+  {t:'Insolation & Heat Budget',s:'Solar radiation, Albedo, Earth\'s heat budget, Greenhouse effect',g:[1],tg:['Heat budget diagram','Albedo concept','Factors affecting insolation']},
+  {t:'Temperature Distribution',s:'Lapse rate, Inversion, Isotherms, Land-sea difference',g:[1],tg:['Temperature inversion diagram','Normal lapse rate value','Controlling factors']},
+  {t:'Atmospheric Pressure & Pressure Belts',s:'Pressure gradient, Pressure belts, Doldrums, Horse latitudes',g:[1],tg:['Draw all pressure belts','Pressure belt shifting','ITCZ concept']},
+  {t:'Winds – Types & Systems',s:'Trade winds, Westerlies, Polar winds, Local winds, Jet streams',g:[1],tg:['Global wind circulation diagram','Coriolis effect','Types of local winds']},
+  {t:'Jet Streams & Upper Air Circulation',s:'Sub-tropical jet, Polar front jet, Rossby waves',g:[1],tg:['Jet stream significance','Western disturbances','Upper air circulation pattern']},
+  {t:'Week 3 Revision + MCQs',s:'Atmosphere, Insolation, Temperature, Pressure, Winds',g:[1],tg:['Complete revision','80 MCQs','Diagram practice']},
+  // WEEK 4 – Climatology II
+  {t:'Humidity, Condensation & Precipitation',s:'Absolute/Relative humidity, Dew point, Cloud types, Rainfall types',g:[1],tg:['Cloud classification','Types of rainfall','Humidity measures']},
+  {t:'Cyclones – Tropical & Temperate',s:'Formation, structure, track; Anticyclones',g:[1],tg:['Cyclone vs anticyclone','Eye of cyclone concept','Naming conventions']},
+  {t:'Climate Classification',s:'Koppen, Thornthwaite, Trewartha classifications',g:[1],tg:['Koppen climate types A-E','Symbols and meanings','India\'s climate types']},
+  {t:'Climate of India + Monsoon',s:'Monsoon mechanism, ITCZ, El Niño effect',g:[1],tg:['Indian monsoon mechanism','El Niño impact on India','Onset and withdrawal dates']},
+  {t:'Climatology – Unit Review',s:'Full Climatology revision & PYQ-style questions',g:[1],tg:['All topics covered','50 practice questions','Comparison tables ready']},
+  {t:'Oceanography – Introduction & Ocean Floor',s:'Ocean basins, Continental shelf, slope, abyss, trenches',g:[2],tg:['Ocean floor profile diagram','Major trenches and ridges','Relief features of ocean floor']},
+  {t:'Week 4 Revision + MCQ Test',s:'Climatology complete (Units 1-2)',g:[0,1],tg:['Unit 1+2 combined test','100 MCQs','Error notebook update']},
+  // WEEK 5 – Oceanography
+  {t:'Ocean Temperature & Salinity',s:'Temperature distribution, thermocline; Salinity patterns, halocline',g:[2],tg:['Thermocline diagram','Salinity variation factors','Dead Sea vs Baltic Sea']},
+  {t:'Ocean Currents',s:'Types, causes, distribution; North & South Atlantic currents',g:[2],tg:['Major ocean current map','Warm vs cold currents','Effect on climate']},
+  {t:'Pacific & Indian Ocean Currents',s:'North Pacific, South Pacific, Indian Ocean circulation',g:[2],tg:['El Niño-ENSO link','Indian Ocean currents','Current-climate connection']},
+  {t:'Tides',s:'Cause of tides, Spring and Neap, Tidal bores, Significance',g:[2],tg:['Spring and neap tide diagram','Tidal energy concept','Commercial significance']},
+  {t:'Waves & Coral Reefs',s:'Wave types, erosion/deposition; Coral reef types, bleaching',g:[2],tg:['Wave dynamics diagram','Fringing/Barrier/Atoll reefs','Coral bleaching causes']},
+  {t:'Marine Resources & Pollution',s:'Fisheries, Minerals, Hydrocarbons; Marine pollution types',g:[2],tg:['Types of marine resources','EEZ concept','Plastic pollution impact']},
+  {t:'Week 5 Revision + MCQ Test',s:'Oceanography complete',g:[2],tg:['Complete Unit 3 revision','80 MCQs','Diagram revision']},
+  // WEEK 6 – Environmental Geography
+  {t:'Ecosystem Concepts',s:'Components, food chain, food web, energy flow, trophic levels',g:[3],tg:['Ecosystem components','Energy pyramid','10% energy law']},
+  {t:'Biomes of the World',s:'Tropical, Temperate, Boreal, Desert, Tundra biomes',g:[3],tg:['Biome distribution map','Vegetation-climate correlation','India\'s biomes']},
+  {t:'Biodiversity',s:'Types, threats, hotspots, conservation methods',g:[3],tg:['India\'s biodiversity hotspots','In-situ vs Ex-situ','Convention on Biodiversity']},
+  {t:'Environmental Problems I',s:'Air, Water, Soil pollution – causes, effects, solutions',g:[3],tg:['Pollution types comparison','Primary vs secondary pollutants','Indian environmental acts']},
+  {t:'Environmental Problems II',s:'Climate change, Global warming, Ozone depletion, Acid rain',g:[3],tg:['Greenhouse gas list','Montreal Protocol','UNFCCC-Paris Agreement']},
+  {t:'Natural Hazards & Disasters',s:'Earthquakes, Volcanoes, Floods, Droughts, Cyclones, Landslides',g:[3],tg:['NDMA India roles','Hazard vs disaster difference','India\'s disaster-prone zones']},
+  {t:'Week 6 Revision + MCQ Test',s:'Environmental Geography complete',g:[3],tg:['Unit 4 complete revision','80 MCQs','India-specific examples']},
+  // WEEK 7 – Population & Settlement
+  {t:'Population Distribution & Density',s:'Global and India patterns, factors of distribution',g:[4],tg:['World population density map','Physiological vs arithmetic density','Factors determining distribution']},
+  {t:'Population Growth & Demographic Transition',s:'Growth stages, DTM model, fertility, mortality rates',g:[4],tg:['DTM 4 stages diagram','India\'s demographic dividend','CBR, CDR, NRR formulas']},
+  {t:'Migration',s:'Types, causes, effects; Brain drain, Refugees; India\'s migration',g:[4],tg:['Push-pull factors','Types of migration','Migration impact on cities']},
+  {t:'Urbanisation & Urban Problems',s:'Urban growth, Primate city, Urban-rural continuum',g:[4],tg:['Smart cities mission','Slums concept','Urban heat island']},
+  {t:'Settlement Geography',s:'Rural & Urban settlements, Patterns, Functions, Hierarchy',g:[4],tg:['Settlement pattern types','Central place theory','Urban hierarchy in India']},
+  {t:'Population Composition',s:'Age-sex structure, Literacy, Occupation, Dependency ratio',g:[4],tg:['Population pyramid types','India census data 2011','Working age population']},
+  {t:'Week 7 Revision + MCQ Test',s:'Population & Settlement Geography complete',g:[4],tg:['Unit 5 complete revision','100 MCQs','Census data revision']},
+  // WEEK 8 – Economic Geography
+  {t:'Agriculture – Types & World Patterns',s:'Subsistence, Commercial farming; Green Revolution, Food security',g:[5],tg:['Von Thünen model','Intensive vs extensive farming','Green Revolution impacts']},
+  {t:'Mining & Mineral Resources',s:'Types of mining, Mineral belts, Strategic minerals',g:[5],tg:['Mineral distribution India','Mining methods comparison','Critical minerals list']},
+  {t:'Energy Resources',s:'Conventional vs Non-conventional; Energy crisis, Renewables',g:[5],tg:['Energy resource types','India\'s solar-wind capacity','Energy security concept']},
+  {t:'Industries – Types & Location',s:'Industrial location theories, Weber\'s theory, Industrial regions',g:[5],tg:['Weber\'s least cost theory','Industrial regions of India','SEZ concept']},
+  {t:'Transport & Communication',s:'Road, Rail, Sea, Air; Pipeline; Significance in development',g:[5],tg:['World trade routes','India\'s transport network','Inland waterways']},
+  {t:'International Trade & WTO',s:'Trade theories, Trade balance, Globalisation, WTO-IMF-World Bank',g:[5],tg:['Comparative advantage','Terms of trade','India\'s trade partners']},
+  {t:'Week 8 Revision + MCQ Test',s:'Economic Geography complete',g:[5],tg:['Unit 6 complete revision','100 MCQs','Theories summary']},
+  // WEEK 9 – Political & Cultural Geography
+  {t:'Political Geography – State & Territory',s:'Elements of state, Boundaries types, Heartland-Rimland theory',g:[6],tg:['Heartland vs Rimland','Mackinder\'s theory','Maritime vs land boundary']},
+  {t:'Geopolitics & Electoral Geography',s:'Geopolitics, Electoral geography, Gerrymandering',g:[6],tg:['Electoral geography India','Geopolitics relevance today','Heartland theory critique']},
+  {t:'Cultural Geography – Concepts',s:'Culture, Cultural landscape, Cultural region, Diffusion',g:[6],tg:['Cultural landscape concept','Sequent occupance','Sauer\'s morphology of landscape']},
+  {t:'Language, Religion & Ethnicity',s:'World language families, Religion distribution, Ethnic conflicts',g:[6],tg:['Language families map','Religion-geography link','India\'s linguistic diversity']},
+  {t:'Social Geography',s:'Social well-being, HDI, Gender geography, Social exclusion',g:[6],tg:['HDI components','Gender Development Index','Social inequality in India']},
+  {t:'Political & Cultural – Unit Review',s:'Full revision of Units 7',g:[6],tg:['All theories covered','India-specific examples','50 practice questions']},
+  {t:'Week 9 Revision + MCQ Test',s:'Political & Cultural Geography test',g:[6],tg:['80 MCQs','Theoretical comparisons','Error analysis']},
+  // WEEK 10 – Geographic Thought I
+  {t:'Ancient & Medieval Geography',s:'Greek, Roman, Arab contributions; Ptolemy, Strabo, Al-Idrisi',g:[7],tg:['Major Greek geographers','Arab contribution to maps','Medieval cartography']},
+  {t:'Classical Schools – Determinism',s:'Environmental Determinism; Ratzel, Semple, Huntington',g:[7],tg:['Ratzel\'s anthropogeography','Huntington\'s climatic hypothesis','Criticism of determinism']},
+  {t:'Possibilism & Stop-and-Go Determinism',s:'Vidal de la Blache, Febre, Taylor\'s stop-and-go',g:[7],tg:['French school possibilism','Genre de vie concept','Comparison with determinism']},
+  {t:'Regional Geography',s:'Hartshorne, Hettner, region concepts, Chorology',g:[7],tg:['Regional geography tradition','Hettner\'s chorological view','Hartshorne\'s Nature of Geography']},
+  {t:'Quantitative Revolution',s:'Statistical methods, Model building, Locational analysis school',g:[7],tg:['Quantitative revolution causes','Schaefer vs Hartshorne debate','Spatial science tradition']},
+  {t:'Humanistic & Welfare Geography',s:'Phenomenology, Tuan\'s topophilia, Social well-being',g:[7],tg:['Humanistic approach tenets','Topophilia concept','Welfare geography focus']},
+  {t:'Week 10 Revision + MCQ Test',s:'Geographic Thought Part I',g:[7],tg:['Classical to quantitative','80 MCQs','Thinker-concept match table']},
+  // WEEK 11 – Geographic Thought II
+  {t:'Radical & Marxist Geography',s:'Harvey, spatial justice, uneven development',g:[7],tg:['Harvey\'s Marxist geography','Social justice in geography','Uneven development concept']},
+  {t:'Feminist Geography',s:'Gender in geography, Critique of masculinist geography',g:[7],tg:['Feminist critique of quantitative','Gendered space concept','Key feminist geographers']},
+  {t:'Post-Modern & Post-Structural Geography',s:'Deconstruction, Discourse, Foucault\'s influence',g:[7],tg:['Post-modern critique','Representation in geography','Cultural turn significance']},
+  {t:'Indian Geographical Thought',s:'Ancient India, Colonial period, Post-independence geography',g:[7],tg:['Colonial geography legacy','Post-independence trends','Key Indian geographers']},
+  {t:'Contemporary Trends in Geography',s:'GIS era, Critical geography, Climate geography, Urban geography',g:[7],tg:['Contemporary specializations','Geographic information science','Applied geography trends']},
+  {t:'Geographic Thought – Unit Review',s:'Complete Units 8 – all schools and thinkers',g:[7],tg:['Thinker timeline','School comparison table','50 MCQs']},
+  {t:'Week 11 Revision + MCQ Test',s:'Complete Geographic Thought test',g:[7],tg:['100 MCQs on geographic thought','Error analysis','Essay answers practice']},
+  // WEEK 12 – Geographical Techniques
+  {t:'Maps – Types, Scales & Projections',s:'Map types, Scale types, Major projections (Mercator, Conic etc.)',g:[8],tg:['Map projection properties','Scale calculation','Choosing right projection']},
+  {t:'Surveying & Field Methods',s:'Chain survey, Plane table, GPS survey; Field data collection',g:[8],tg:['Plane table methods','GPS working principle','Traversing concept']},
+  {t:'Remote Sensing – Basics',s:'EM spectrum, Sensors, Platforms, Image types',g:[8],tg:['Active vs passive sensors','Spatial-spectral resolution','RS bands significance']},
+  {t:'Remote Sensing – Interpretation & Applications',s:'Image interpretation, DIP, Satellite missions (IRS, Landsat)',g:[8],tg:['IRS satellite series','LISS-III sensor bands','Land use classification']},
+  {t:'Geographic Information System (GIS)',s:'Components, Data models, Spatial analysis, GIS applications',g:[8],tg:['Vector vs raster data','GIS components','QGIS/ArcGIS applications']},
+  {t:'Cartography & Statistical Maps',s:'Thematic maps, Choropleth, Isopleth, Dot map, Flow map',g:[8],tg:['Thematic map types','Choropleth construction','Statistical diagram types']},
+  {t:'Week 12 Revision + MCQ Test',s:'Geographical Techniques complete',g:[8],tg:['Unit 9 complete revision','80 MCQs','Map and GIS practicals']},
+  // WEEK 13 – Research Methodology + Full PYQ
+  {t:'Research Methodology – Concepts & Types',s:'Research meaning, Types, Research design, Hypothesis',g:[9],tg:['Types of research','Hypothesis formulation','Deductive vs inductive']},
+  {t:'Data Collection & Sampling',s:'Primary vs secondary data, Sampling methods, Questionnaire design',g:[9],tg:['Random vs stratified sampling','Questionnaire construction','Validity and reliability']},
+  {t:'Statistical Techniques I',s:'Mean, Median, Mode, Standard Deviation, Variance',g:[9],tg:['Central tendency measures','Dispersion measures','Numerical problems practice']},
+  {t:'Statistical Techniques II',s:'Correlation, Regression, Chi-Square, t-Test, ANOVA',g:[9],tg:['Pearson correlation formula','Chi-square interpretation','When to use each test']},
+  {t:'Research Report & Citation',s:'Research report structure, APA/MLA/Harvard citations',g:[9],tg:['Research paper structure','Citation style differences','Bibliography format']},
+  {t:'Full PYQ Session – Units 1–5',s:'Previous Year Questions focused session',g:[0,1,2,3,4],tg:['50 PYQ from Geomorphology & Climatology','40 PYQ from Oceanography & Env.','Identify repeat topics']},
+  {t:'Week 13 Revision + Full Syllabus Test',s:'All 10 Units – Grand Mock Test',g:[0,1,2,3,4,5,6,7,8,9],tg:['Grand revision','100+ MCQ test','Rank weak units for final push']},
+];
+
+// Generate full 90-day plan
+for(let i=0;i<90;i++){
+  const d = dayTopics[i] || dayTopics[dayTopics.length-1];
+  const w = Math.floor(i/7)+1;
+  const dayOfWeek = i%7;
+  const isTest = dayOfWeek === 6;
+  PLAN.push({
+    day: i+1,
+    week: w,
+    topic: d.t,
+    subtopic: d.s,
+    targets: d.tg,
+    units: d.g,
+    studyHours: 7,
+    isTestDay: isTest,
+    schedule: isTest ? [
+      {time:'6:00–8:00 AM', task:'Full revision of week topics'},
+      {time:'10:00–12:00 PM', task:'MCQ Mock Test (100 questions)'},
+      {time:'3:00–4:00 PM', task:'Error analysis & notebook update'},
+      {time:'6:00–7:00 PM', task:'Weak area re-reading'},
+      {time:'9:00–10:00 PM', task:'Plan next week + notes review'}
+    ] : [
+      {time:'6:00–8:00 AM', task:'Morning Session'},
+      {time:'10:00–12:00 PM', task:'Late Morning'},
+      {time:'3:15–5:15 PM', task:'Afternoon'},
+      {time:'9:00–10:00 PM', task:'Night Revision'}
+    ]
+  });
+}
+
+// ============================================================
+// STORAGE
+// ============================================================
+function load(k,def){ try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch{return def;} }
+function save(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
+
+let progress = load('ngp_progress',{});  // {dayNum: {checks:[false,false,false,false],hours:7,notes:''}}
+let tests = load('ngp_tests',[]);
+let revisions = load('ngp_revisions',{}); // {unitIdx:{r1,r2,r3}}
+
+function getDayProgress(d){ return progress[d]||{checks:[false,false,false,false],hours:0,notes:''}; }
+function isDayDone(d){ const p=getDayProgress(d); return p.checks&&p.checks.every(c=>c); }
+function getCompletedCount(){ return Object.keys(progress).filter(d=>isDayDone(+d)).length; }
+function getStreak(){
+  let s=0,today=currentDay();
+  for(let d=today;d>=1;d--){ if(isDayDone(d))s++; else break; }
+  return s;
+}
+function getTotalHours(){ return Object.values(progress).reduce((a,p)=>a+(parseFloat(p.hours)||0),0); }
+function currentDay(){
+  const now=new Date(); const diff=Math.floor((now-START_DATE)/(1000*60*60*24));
+  return Math.max(1,Math.min(90,diff+1));
+}
+function dayDate(dayNum){
+  const d=new Date(START_DATE); d.setDate(d.getDate()+dayNum-1); return d;
+}
+function fmtDate(d){ return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); }
+
+// ============================================================
+// TABS
+// ============================================================
+function showTab(name){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  
+  // Find matching nav element manually to work without inline event
+  const tabs = document.querySelectorAll('.nav-tab');
+  tabs.forEach(tab => {
+    if(tab.getAttribute('onclick').includes(name)){
+      tab.classList.add('active');
+    }
+  });
+
+  if(name==='dashboard') renderDashboard();
+  if(name==='plan') renderPlan();
+  if(name==='progress') renderProgress();
+  if(name==='calendar') renderCalendar();
+  if(name==='tests') renderTests();
+  if(name==='revision') renderRevision();
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+// ============================================================
+// DASHBOARD
+// ============================================================
+let pieChart,barChart,hoursChart,testChart;
+let activeCurrentDay = load('ngp_current_day', null);
+
+function currentDay(){
+  if (activeCurrentDay !== null) return activeCurrentDay;
+  const now=new Date(); const diff=Math.floor((now-START_DATE)/(1000*60*60*24));
+  return Math.max(1,Math.min(90,diff+1));
+}
+
+function populateCurrentDaySelect() {
+  const select = document.getElementById('current-day-select');
+  if (!select) return;
+  select.innerHTML = '';
+  for(let i=1; i<=90; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `Day ${i}`;
+    if (i === currentDay()) opt.selected = true;
+    select.appendChild(opt);
+  }
+}
+
+function changeCurrentDay(val) {
+  activeCurrentDay = parseInt(val);
+  save('ngp_current_day', activeCurrentDay);
+  renderApp();
+}
+
+function changeStartDate(val) {
+  if (!val) return;
+  START_DATE = new Date(val);
+  save('ngp_start_date', val);
+  renderApp();
+}
+
+function renderDashboard(){
+  populateCurrentDaySelect();
+  const picker = document.getElementById('start-date-picker');
+  if (picker) {
+    const yyyy = START_DATE.getFullYear();
+    const mm = String(START_DATE.getMonth() + 1).padStart(2, '0');
+    const dd = String(START_DATE.getDate()).padStart(2, '0');
+    picker.value = `${yyyy}-${mm}-${dd}`;
+  }
+  const comp=getCompletedCount(), rem=90-comp, streak=getStreak(), hrs=getTotalHours();
+  const today=currentDay();
+  document.getElementById('d-completed').textContent=comp;
+  document.getElementById('d-remaining').textContent=rem;
+  document.getElementById('d-streak').innerHTML=streak+' <span class="streak-fire">🔥</span>';
+  document.getElementById('d-hours').textContent=hrs.toFixed(1);
+  document.getElementById('today-badge').textContent=`Day ${today} of 90`;
+
+  // Calculate Averages
+  const weeksElapsed = Math.max(1, today / 7);
+  const monthsElapsed = Math.max(1, today / 30);
+  const weeklyAvg = hrs / weeksElapsed;
+  const monthlyAvg = hrs / monthsElapsed;
+  document.getElementById('d-hours-averages').innerHTML = `Wk Avg: <strong>${weeklyAvg.toFixed(1)}h</strong> | Mo Avg: <strong>${monthlyAvg.toFixed(1)}h</strong>`;
+
+  // Unit progress
+  const unitEl=document.getElementById('unit-progress-dash');
+  unitEl.innerHTML='';
+  UNITS.forEach((u,ui)=>{
+    const days=PLAN.filter(d=>d.units.includes(ui));
+    const done=days.filter(d=>isDayDone(d.day)).length;
+    const pct=days.length?Math.round(done/days.length*100):0;
+    const color=pct>=80?'green':pct>=40?'amber':'';
+    unitEl.innerHTML+=`<div class="pbar-wrap"><div class="pbar-label"><span>${u}</span><span>${pct}%</span></div><div class="pbar"><div class="pbar-fill ${color}" style="width:${pct}%"></div></div></div>`;
+  });
+
+  // Pie
+  if(pieChart) pieChart.destroy();
+  pieChart=new Chart(document.getElementById('chart-pie'),{type:'doughnut',data:{labels:['Completed','Remaining'],datasets:[{data:[comp,rem],backgroundColor:['#22c55e','#1e2535'],borderColor:['#16a34a','#2a3348'],borderWidth:2}]},options:{responsive:true,plugins:{legend:{labels:{color:'#8898b8',font:{family:'DM Sans'}}}}}});
+
+  // Bar – weekly completion
+  const wkLabels=[],wkData=[];
+  for(let w=1;w<=13;w++){
+    const days=PLAN.filter(d=>d.week===w);
+    const done=days.filter(d=>isDayDone(d.day)).length;
+    wkLabels.push('W'+w); wkData.push(days.length?Math.round(done/days.length*100):0);
+  }
+  if(barChart) barChart.destroy();
+  barChart=new Chart(document.getElementById('chart-bar'),{type:'bar',data:{labels:wkLabels,datasets:[{label:'% Complete',data:wkData,backgroundColor:'rgba(79,156,249,0.6)',borderColor:'#4f9cf9',borderWidth:1,borderRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8898b8'},grid:{color:'#1e2535'}},y:{ticks:{color:'#8898b8'},grid:{color:'#1e2535'},max:100}}}});
+
+  // Bar – study hours logged per week
+  const wkHoursData = [];
+  for(let w=1;w<=13;w++){
+    const days = PLAN.filter(d=>d.week===w);
+    const hours = days.reduce((sum, d) => sum + (parseFloat(getDayProgress(d.day).hours) || 0), 0);
+    wkHoursData.push(hours);
+  }
+  if(hoursChart) hoursChart.destroy();
+  hoursChart=new Chart(document.getElementById('chart-hours'),{type:'bar',data:{labels:wkLabels,datasets:[{label:'Hours Studied',data:wkHoursData,backgroundColor:'rgba(245,158,11,0.6)',borderColor:'#f59e0b',borderWidth:1,borderRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8898b8'},grid:{color:'#1e2535'}},y:{ticks:{color:'#8898b8'},grid:{color:'#1e2535'},suggestedMax:56}}}});
+}
+
+// ============================================================
+// STUDY PLAN
+// ============================================================
+function renderPlan(){
+  const w=+document.getElementById('week-select').value;
+  const days=PLAN.filter(d=>d.week===w);
+  const goal=WEEK_GOALS[w-1]||'Study';
+  const allDone=days.every(d=>isDayDone(d.day));
+
+  document.getElementById('plan-week-banner').innerHTML=`
+    <div class="week-banner">
+      <div>
+        <div class="week-banner-title">Week ${w} ${allDone?'✅':''}</div>
+        <div class="week-banner-meta">${goal}</div>
+      </div>
+      <div>${days.map(d=>`<span style="display:inline-block;width:18px;height:18px;border-radius:4px;background:${isDayDone(d.day)?'#22c55e':d.day===currentDay()?'#3b82f6':'#1e2535'};margin:1px;"></span>`).join('')}</div>
+    </div>`;
+
+  document.getElementById('plan-days').innerHTML=days.map(d=>{
+    const done=isDayDone(d.day);
+    const today=d.day===currentDay();
+    return `<div class="day-card ${done?'done':''} ${today?'today':''}" onclick="openModal(${d.day})">
+      <div class="day-card-head">
+        <div class="day-num">Day ${d.day} · ${fmtDate(dayDate(d.day))}</div>
+        <div>${done?'<span class="tag tag-green">Done ✓</span>':today?'<span class="tag tag-blue">Today</span>':'<span class="tag tag-gray">Pending</span>'}</div>
+      </div>
+      <div class="day-card-body">
+        <div class="day-topic">${d.topic}</div>
+        <div class="day-subtopic">${d.subtopic}</div>
+        <ul class="day-targets">
+          ${d.targets.map(t=>`<li>${t}</li>`).join('')}
+        </ul>
+        <div class="day-schedule">
+          ${d.schedule.map(s=>`<div class="schedule-row"><span class="schedule-time">${s.time}</span><span class="schedule-task">${s.task}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// PROGRESS
+// ============================================================
+function renderProgress(){
+  const comp=getCompletedCount(), rem=90-comp;
+  document.getElementById('progress-stats').innerHTML=`
+    <div class="stat-chip"><div class="stat-chip-label">Total Days</div><div class="stat-chip-val">90</div></div>
+    <div class="stat-chip"><div class="stat-chip-label">Completed</div><div class="stat-chip-val" style="color:var(--green)">${comp}</div></div>
+    <div class="stat-chip"><div class="stat-chip-label">Remaining</div><div class="stat-chip-val">${rem}</div></div>
+    <div class="stat-chip"><div class="stat-chip-label">Percentage</div><div class="stat-chip-val" style="color:var(--accent)">${Math.round(comp/90*100)}%</div></div>
+  `;
+
+  let html='';
+  for(let w=1;w<=13;w++){
+    const days=PLAN.filter(d=>d.week===w);
+    const wDone=days.every(d=>isDayDone(d.day));
+    html+=`
+      <div class="progress-week-header" onclick="toggleWeekCollapse(${w})">
+        <span style="font-family:'Syne',sans-serif;font-weight:700;">Week ${w}</span>
+        <span class="week-status" style="color:${wDone?'var(--green)':'var(--accent3)'}">${wDone?'Completed ✅':'In Progress ⏳'}</span>
+      </div>
+      <div class="progress-week-days" id="p-week-${w}" style="display:block;">
+        ${days.map(d=>{
+          const p=getDayProgress(d.day);
+          return `
+            <div class="progress-day-row">
+              <div class="progress-day-label">Day ${d.day}</div>
+              <div class="progress-day-topic">${d.topic}</div>
+              <div class="checkbox-group">
+                <label class="check-item"><input type="checkbox" ${p.checks[0]?'checked':''} onchange="toggleCheck(${d.day},0)"> Topic Completed</label>
+                <label class="check-item"><input type="checkbox" ${p.checks[1]?'checked':''} onchange="toggleCheck(${d.day},1)"> Notes Prepared</label>
+                <label class="check-item"><input type="checkbox" ${p.checks[2]?'checked':''} onchange="toggleCheck(${d.day},2)"> Revision Done</label>
+                <label class="check-item"><input type="checkbox" ${p.checks[3]?'checked':''} onchange="toggleCheck(${d.day},3)"> Target Achieved</label>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+  document.getElementById('progress-weeks').innerHTML=html;
+}
+
+function toggleWeekCollapse(w){
+  const el=document.getElementById('p-week-'+w);
+  el.style.display=el.style.display==='none'?'block':'none';
+}
+
+function toggleCheck(dayNum,idx){
+  if(!progress[dayNum]) progress[dayNum]={checks:[false,false,false,false],hours:7,notes:''};
+  progress[dayNum].checks[idx]=!progress[dayNum].checks[idx];
+  save('ngp_progress',progress);
+  renderProgress();
+}
+
+// ============================================================
+// CALENDAR
+// ============================================================
+function renderCalendar(){
+  const container=document.getElementById('cal-container');
+  container.innerHTML='';
+  PLAN.forEach(d=>{
+    const p=getDayProgress(d.day);
+    const comp=isDayDone(d.day);
+    const today=d.day===currentDay();
+    const cls=comp?'done':today?'today-cal':'pending';
+    const hasNotes = p.notes && p.notes.trim().length > 0;
+    const notesIndicator = hasNotes ? `<span style="position:absolute; top:4px; right:4px; font-size:9px;">📝</span>` : '';
+    container.innerHTML+=`
+      <div class="cal-cell ${cls}" onclick="openModal(${d.day})">
+        ${notesIndicator}
+        <div>${d.day}</div>
+        <div class="cal-unit">${UNITS[d.units[0]] ? UNITS[d.units[0]].split(' ')[0] : 'Syllabus'}</div>
+      </div>
+    `;
+  });
+}
+
+// ============================================================
+// REVISION
+// ============================================================
+function renderRevision(){
+  const el=document.getElementById('rev-units');
+  el.innerHTML='';
+  UNITS.forEach((u,ui)=>{
+    const rev=revisions[ui]||{r1:false,r2:false,r3:false};
+    el.innerHTML+=`
+      <div class="rev-unit">
+        <div class="rev-unit-name">${u}</div>
+        <div class="rev-checks">
+          <label class="check-item"><input type="checkbox" ${rev.r1?'checked':''} onchange="toggleRev(${ui},'r1')"> Revision 1</label>
+          <label class="check-item"><input type="checkbox" ${rev.r2?'checked':''} onchange="toggleRev(${ui},'r2')"> Revision 2</label>
+          <label class="check-item"><input type="checkbox" ${rev.r3?'checked':''} onchange="toggleRev(${ui},'r3')"> Revision 3</label>
+        </div>
+      </div>
+    `;
+  });
+}
+function toggleRev(ui,rKey){
+  if(!revisions[ui]) revisions[ui]={r1:false,r2:false,r3:false};
+  revisions[ui][rKey]=!revisions[ui][rKey];
+  save('ngp_revisions',revisions);
+  renderRevision();
+}
+
+// ============================================================
+// TESTS
+// ============================================================
+function renderTests(){
+  const tbody=document.getElementById('test-tbody');
+  tbody.innerHTML='';
+  let totalPct=0,highPct=0;
+  tests.forEach((t,ti)=>{
+    const pct=t.total?Math.round(t.score/t.total*100):0;
+    totalPct+=pct; if(pct>highPct) highPct=pct;
+    
+    // Choose status color
+    const colorStyle = pct >= 70 ? 'color:var(--green); font-weight:bold;' : pct >= 50 ? 'color:var(--accent3); font-weight:bold;' : 'color:var(--red); font-weight:bold;';
+    
+    tbody.innerHTML+=`<tr>
+      <td>${t.name}</td>
+      <td>${t.date}</td>
+      <td>${t.score}</td>
+      <td>${t.total}</td>
+      <td style="${colorStyle}">${pct}%</td>
+      <td><button class="btn btn-outline btn-sm" onclick="delTest(${ti})">✕</button></td>
+    </tr>`;
+  });
+
+  const avg=tests.length?Math.round(totalPct/tests.length):0;
+  document.getElementById('t-avg').textContent=tests.length?avg+'%':'—';
+  document.getElementById('t-high').textContent=tests.length?highPct+'%':'—';
+  document.getElementById('t-count').textContent=tests.length;
+
+  // Chart
+  if(testChart) testChart.destroy();
+  testChart=new Chart(document.getElementById('chart-tests'),{type:'line',data:{labels:tests.map(t=>t.name),datasets:[{label:'Score %',data:tests.map(t=>t.total?Math.round(t.score/t.total*100):0),borderColor:'#4f9cf9',backgroundColor:'rgba(79,156,249,0.1)',fill:true,tension:0.1}]},options:{responsive:true,scales:{x:{ticks:{color:'#8898b8'},grid:{color:'#1e2535'}},y:{ticks:{color:'#8898b8'},grid:{color:'#1e2535'},max:100}}}});
+}
+
+function addTest(){
+  const name=document.getElementById('t-name').value.trim();
+  const date=document.getElementById('t-date').value;
+  const score=+document.getElementById('t-score').value;
+  const total=+document.getElementById('t-total').value;
+  if(!name||!date) return;
+  tests.push({name,date,score,total});
+  save('ngp_tests',tests);
+  document.getElementById('t-name').value='';
+  document.getElementById('t-score').value='';
+  renderTests();
+  showToast('Test Result Added!');
+}
+
+function delTest(i){
+  tests.splice(i,1);
+  save('ngp_tests',tests);
+  renderTests();
+}
+
+// ============================================================
+// MODAL DETAILS
+// ============================================================
+let activeModalDay=null;
+
+function autoSaveModalFields(){
+  const d = activeModalDay;
+  if(!d) return;
+  if(!progress[d]) progress[d]={checks:[false,false,false,false],hours:7,notes:''};
+  
+  const c0 = document.getElementById('m-c0');
+  const c1 = document.getElementById('m-c1');
+  const c2 = document.getElementById('m-c2');
+  const c3 = document.getElementById('m-c3');
+  if (c0) progress[d].checks[0] = c0.checked;
+  if (c1) progress[d].checks[1] = c1.checked;
+  if (c2) progress[d].checks[2] = c2.checked;
+  if (c3) progress[d].checks[3] = c3.checked;
+  
+  const h = document.getElementById('modal-hours');
+  if (h) progress[d].hours = parseFloat(h.value) || 0;
+  
+  const n = document.getElementById('modal-notes');
+  if (n) progress[d].notes = n.value;
+  
+  save('ngp_progress', progress);
+  updateCoreStats();
+}
+
+function openModal(d){
+  activeModalDay=d;
+  const dayData=PLAN[d-1];
+  const p=getDayProgress(d);
+
+  document.getElementById('modal-title').textContent=`Day ${d}`;
+  document.getElementById('modal-date').textContent=fmtDate(dayDate(d));
+  document.getElementById('modal-topic').textContent=dayData.topic;
+  document.getElementById('modal-subtopic').textContent=dayData.subtopic;
+
+  document.getElementById('modal-targets').innerHTML=dayData.targets.map(t=>`<li>${t}</li>`).join('');
+
+  document.getElementById('modal-checks').innerHTML=`
+    <label class="check-item"><input type="checkbox" id="m-c0" ${p.checks[0]?'checked':''} onchange="autoSaveModalFields()"> Topic Completed</label>
+    <label class="check-item"><input type="checkbox" id="m-c1" ${p.checks[1]?'checked':''} onchange="autoSaveModalFields()"> Notes Prepared</label>
+    <label class="check-item"><input type="checkbox" id="m-c2" ${p.checks[2]?'checked':''} onchange="autoSaveModalFields()"> Revision Done</label>
+    <label class="check-item"><input type="checkbox" id="m-c3" ${p.checks[3]?'checked':''} onchange="autoSaveModalFields()"> Daily Target Achieved</label>
+  `;
+
+  document.getElementById('modal-hours').value=p.hours || 7;
+  document.getElementById('modal-notes').value=p.notes || '';
+  
+  // Attach key up/input events for immediate auto-saving
+  document.getElementById('modal-notes').oninput = autoSaveModalFields;
+  document.getElementById('modal-hours').oninput = autoSaveModalFields;
+
+  document.getElementById('day-modal').classList.add('open');
+}
+
+function closeModal(e){
+  if(e.target===document.getElementById('day-modal')) closeModalDirect();
+}
+
+function closeModalDirect(){
+  document.getElementById('day-modal').classList.remove('open');
+  renderApp(); // Full render on close to update visual components
+}
+
+function saveModalDay(){
+  autoSaveModalFields();
+  closeModalDirect();
+  showToast('Day Saved!');
+}
+
+// ============================================================
+// EXPORT HANDLERS
+// ============================================================
+function exportCSV(){
+  let csv='Day,Topic,Completed,Study Hours,Notes\n';
+  PLAN.forEach(d=>{
+    const p=getDayProgress(d.day);
+    const done=isDayDone(d.day)?'Yes':'No';
+    const notes=p.notes?p.notes.replace(/"/g,'""'):'';
+    csv+=`${d.day},"${d.topic}",${done},${p.hours},"${notes}"\n`;
+  });
+  triggerDownload(csv,'csv','ugc_net_geography_progress.csv');
+}
+
+function exportJSON(){
+  const backup={progress,tests,revisions};
+  triggerDownload(JSON.stringify(backup,null,2),'json','ugc_net_geography_backup.json');
+}
+
+function exportNotes(){
+  let notesText='UGC NET Geography Study Notes Dump\n==================================\n\n';
+  PLAN.forEach(d=>{
+    const p=getDayProgress(d.day);
+    if(p.notes){
+      notesText+=`Day ${d.day} - ${d.topic}\nNotes: ${p.notes}\n-----------------------------------\n\n`;
+    }
+  });
+  triggerDownload(notesText,'text','ugc_net_geography_notes.txt');
+}
+
+function triggerDownload(content,type,filename){
+  const blob=new Blob([content],{type:type==='csv'?'text/csv':type==='json'?'application/json':'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',2000);
+}
+
+function renderApp(){
+  updateCoreStats();
+  renderDashboard();
+  renderPlan();
+  renderProgress();
+  renderCalendar();
+  renderTests();
+  renderRevision();
+}
+
+function updateCoreStats(){
+  const comp=getCompletedCount(), hrs=getTotalHours(), streak=getStreak();
+  document.getElementById('d-completed').textContent=comp;
+  document.getElementById('d-remaining').textContent=90-comp;
+  document.getElementById('d-streak').innerHTML=streak+' <span class="streak-fire">🔥</span>';
+  document.getElementById('d-hours').textContent=hrs.toFixed(1);
+}
+
+// Initial render
+window.onload=()=>{
+  renderApp();
+  renderBackupStats();
+  initDragDrop();
+};
+
+// ============================================================
+// BACKUP & RESTORE
+// ============================================================
+function exportBackup(){
+  const data = {
+    _app: 'NETScheduler',
+    _version: 1,
+    _exportedAt: new Date().toISOString(),
+    progress: progress,
+    tests: tests,
+    revisions: revisions,
+    currentDay: activeCurrentDay || currentDay(),
+    startDate: START_DATE.toISOString().slice(0,10)
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const dateStr = new Date().toISOString().slice(0,10);
+  a.download = `net-geo-backup-${dateStr}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Backup downloaded!');
+}
+
+function exportCSV(){
+  let csv = 'Day,Topic,Subtopics,Completed,Hours,Notes\n';
+  PLAN.forEach(p=>{
+    const d = getDayProgress(p.day);
+    const done = d.checks && d.checks.every(c=>c) ? 'Yes' : 'No';
+    const topic = '"'+p.topic.replace(/"/g,'""')+'"';
+    const subs = '"'+p.targets.join('; ').replace(/"/g,'""')+'"';
+    const notes = '"'+(d.notes||'').replace(/"/g,'""')+'"';
+    csv += `${p.day},${topic},${subs},${done},${d.hours||0},${notes}\n`;
+  });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `net-geo-summary-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('CSV downloaded!');
+}
+
+function importBackup(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  processImportFile(file);
+}
+
+function processImportFile(file){
+  const resultEl = document.getElementById('import-result');
+  if(!file.name.endsWith('.json')){
+    resultEl.style.display='block';
+    resultEl.style.color='var(--red)';
+    resultEl.textContent='❌ Please select a .json backup file';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!data._app || data._app !== 'NETScheduler'){
+        resultEl.style.display='block';
+        resultEl.style.color='var(--red)';
+        resultEl.textContent='❌ This doesn\'t look like a NETScheduler backup file';
+        return;
+      }
+      // Confirm before overwriting
+      if(!confirm('This will replace ALL your current progress with the backup data. Continue?')) return;
+
+      progress = data.progress || {};
+      tests = data.tests || [];
+      revisions = data.revisions || {};
+      if(data.currentDay){ activeCurrentDay = data.currentDay; save('ngp_current_day', activeCurrentDay); }
+      if(data.startDate){ START_DATE = new Date(data.startDate); save('ngp_start_date', data.startDate); }
+      save('ngp_progress', progress);
+      save('ngp_tests', tests);
+      save('ngp_revisions', revisions);
+      renderApp();
+      renderBackupStats();
+
+      resultEl.style.display='block';
+      resultEl.style.color='var(--green)';
+      const exportDate = data._exportedAt ? new Date(data._exportedAt).toLocaleDateString('en-IN') : 'unknown';
+      resultEl.textContent=`✅ Restored successfully! Backup was from ${exportDate}. ${Object.keys(data.progress||{}).length} days of progress imported.`;
+      showToast('Progress restored!');
+    } catch(err){
+      resultEl.style.display='block';
+      resultEl.style.color='var(--red)';
+      resultEl.textContent='❌ Error reading file: ' + err.message;
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetAllData(){
+  if(!confirm('Are you SURE you want to delete all progress? This cannot be undone!')) return;
+  if(!confirm('Really? This will erase everything. Last chance!')) return;
+  localStorage.removeItem('ngp_progress');
+  localStorage.removeItem('ngp_tests');
+  localStorage.removeItem('ngp_revisions');
+  localStorage.removeItem('ngp_current_day');
+  progress = {};
+  tests = [];
+  revisions = {};
+  activeCurrentDay = null;
+  renderApp();
+  renderBackupStats();
+  showToast('All progress reset');
+}
+
+function renderBackupStats(){
+  const el = document.getElementById('backup-stats');
+  if(!el) return;
+  const comp = getCompletedCount();
+  const hrs = getTotalHours();
+  const dataSize = new Blob([JSON.stringify({progress,tests,revisions})]).size;
+  const sizeStr = dataSize < 1024 ? dataSize+' B' : (dataSize/1024).toFixed(1)+' KB';
+  el.innerHTML = `
+    <div class="stat-chip"><div class="stat-chip-label">Days Tracked</div><div class="stat-chip-val">${Object.keys(progress).length}</div></div>
+    <div class="stat-chip"><div class="stat-chip-label">Days Completed</div><div class="stat-chip-val">${comp}</div></div>
+    <div class="stat-chip"><div class="stat-chip-label">Total Hours</div><div class="stat-chip-val">${hrs.toFixed(1)}</div></div>
+    <div class="stat-chip"><div class="stat-chip-label">Tests Logged</div><div class="stat-chip-val">${tests.length}</div></div>
+    <div class="stat-chip"><div class="stat-chip-label">Data Size</div><div class="stat-chip-val">${sizeStr}</div></div>
+    <div class="stat-chip"><div class="stat-chip-label">Start Date</div><div class="stat-chip-val">${START_DATE.toLocaleDateString('en-IN')}</div></div>
+  `;
+  // Also update export stats
+  const exportEl = document.getElementById('export-stats');
+  if(exportEl) exportEl.textContent = `📊 ${comp}/90 days completed • ${hrs.toFixed(1)} hours logged • ${tests.length} tests`;
+}
+
+function initDragDrop(){
+  const drop = document.getElementById('file-drop');
+  if(!drop) return;
+  ['dragenter','dragover'].forEach(e=>{
+    drop.addEventListener(e, ev=>{ ev.preventDefault(); drop.classList.add('drag-over'); });
+  });
+  ['dragleave','drop'].forEach(e=>{
+    drop.addEventListener(e, ev=>{ ev.preventDefault(); drop.classList.remove('drag-over'); });
+  });
+  drop.addEventListener('drop', ev=>{
+    const file = ev.dataTransfer.files[0];
+    if(file) processImportFile(file);
+  });
+}
+</script>
+
+<!-- Firebase realtime sync: Firestore listener + push/pull helpers -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+  // Firebase config (from user)
+  const firebaseConfig = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  // Anonymous auth so writes are authenticated if rules require it
+  signInAnonymously(auth).catch(()=>{});
+
+  const docRef = doc(db, 'netscheduler', 'shared');
+
+  let lastRemoteUpdate = 0;
+  let lastLocalHash = '';
+  let lastPushTime = 0;
+
+  function computeLocalHash(){
+    try{ return btoa(unescape(encodeURIComponent(JSON.stringify({progress,tests,revisions})))) }catch(e){ return '' }
+  }
+
+  // Listen for remote changes and apply to local state
+  onSnapshot(docRef, snap => {
+    if(!snap.exists()) return;
+    const data = snap.data();
+    if(!data) return;
+    const remoteUpdated = data._updatedAt || 0;
+    // If this update came from our last push, just note it
+    if(remoteUpdated === lastPushTime){ lastRemoteUpdate = remoteUpdated; return; }
+    if(remoteUpdated <= lastRemoteUpdate) return;
+    lastRemoteUpdate = remoteUpdated;
+
+    // Apply remote data to local app state
+    if(data.progress) progress = data.progress;
+    if(data.tests) tests = data.tests;
+    if(data.revisions) revisions = data.revisions;
+    if(data.currentDay) { activeCurrentDay = data.currentDay; save('ngp_current_day', activeCurrentDay); }
+    if(data.startDate) { START_DATE = new Date(data.startDate); save('ngp_start_date', data.startDate); }
+    save('ngp_progress', progress);
+    save('ngp_tests', tests);
+    save('ngp_revisions', revisions);
+    renderApp();
+    showToast('Synced from Firebase');
+  }, err=>console.error('Firestore onSnapshot error',err));
+
+  // Push local state to Firestore
+  async function pushToCloud(){
+    try{
+      const payload = {
+        progress: progress,
+        tests: tests,
+        revisions: revisions,
+        currentDay: activeCurrentDay || currentDay(),
+        startDate: START_DATE.toISOString().slice(0,10),
+        _updatedAt: Date.now()
+      };
+      lastPushTime = payload._updatedAt;
+      await setDoc(docRef, payload, { merge: true });
+      showToast('Pushed to Firebase');
+    }catch(e){ console.error('pushToCloud error',e); }
+  }
+
+  // Expose helpers for manual control
+  window.cloudPush = pushToCloud;
+  window.cloudPull = async ()=>{
+    try{ const snap = await getDoc(docRef); if(!snap.exists()) return; const d = snap.data(); if(d.progress) progress = d.progress; if(d.tests) tests = d.tests; if(d.revisions) revisions = d.revisions; renderApp(); showToast('Pulled from Firebase'); }catch(e){console.error(e)}
+  };
+
+  // Auto-detect local changes and push periodically
+  setInterval(()=>{
+    const h = computeLocalHash();
+    if(h && h !== lastLocalHash){ lastLocalHash = h; pushToCloud(); }
+  }, 8000);
+
+  // Also push when the page is hidden/unload to reduce lost edits
+  window.addEventListener('beforeunload', ()=>{ try{ pushToCloud(); }catch{} });
+
+  // Note: you can call `cloudPush()` or `cloudPull()` from the console
+</script>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "netscheduler",
+  "version": "1.0.0",
+  "description": "UGC NET Geography – 90 Day Tracker with Firebase & Vercel",
+  "scripts": {
+    "build": "node inject-env.js",
+    "start": "live-server"
+  },
+  "keywords": [],
+  "author": "pranjalyadav02",
+  "license": "ISC",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
