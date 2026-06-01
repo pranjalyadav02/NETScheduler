@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UGC NET Geography – 90 Day Tracker</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0e1117">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
@@ -263,6 +265,7 @@
       <button class="btn btn-outline" onclick="exportCSV()">📥 Export Progress CSV</button>
       <button class="btn btn-outline" onclick="exportJSON()">📥 Export Full JSON</button>
       <button class="btn btn-outline" onclick="exportNotes()">📥 Export Notes</button>
+      <button id="install-btn" class="btn btn-primary" style="display:none;margin-left:8px" onclick="promptInstall()">📱 Install as App</button>
     </div>
   </div>
 </div>
@@ -1344,6 +1347,46 @@ function initDragDrop(){
   window.addEventListener('beforeunload', ()=>{ try{ pushToCloud(); }catch{} });
 
   // Note: you can call `cloudPush()` or `cloudPull()` from the console
+</script>
+
+<!-- PWA: service worker registration and install prompt handling -->
+<script>
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js').then(() => {
+        console.log('Service worker registered');
+      }).catch(()=>{});
+    });
+  }
+
+  // beforeinstallprompt handling
+  let deferredPrompt = null;
+  const installBtn = document.getElementById('install-btn');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (installBtn) {
+      installBtn.style.display = 'inline-block';
+    }
+  });
+
+  window.promptInstall = async function() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    if (choice && choice.outcome) {
+      showToast('Install ' + (choice.outcome === 'accepted' ? 'accepted' : 'dismissed'));
+    }
+    deferredPrompt = null;
+    if (installBtn) installBtn.style.display = 'none';
+  };
+
+  window.addEventListener('appinstalled', () => {
+    showToast('App installed');
+    if (installBtn) installBtn.style.display = 'none';
+  });
 </script>
 
 </body>
