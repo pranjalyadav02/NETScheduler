@@ -790,7 +790,14 @@
 // ============================================================
 // DATA – 90-DAY PLAN (13 weeks syllabus + 1 week PYQ/tests)
 // ============================================================
-let START_DATE = new Date(localStorage.getItem('ngp_start_date') ? JSON.parse(localStorage.getItem('ngp_start_date')) : '2026-06-01');
+// Default study start date to TODAY if never set before
+(function initStudyStartDate() {
+  if (!localStorage.getItem('ngp_start_date')) {
+    const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
+    localStorage.setItem('ngp_start_date', JSON.stringify(todayStr));
+  }
+})();
+let START_DATE = new Date(JSON.parse(localStorage.getItem('ngp_start_date')));
 
 // Default diet start date to TODAY if never set before
 (function initDietStartDate() {
