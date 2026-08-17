@@ -215,6 +215,47 @@
   .file-drop:hover, .file-drop.drag-over { border-color:var(--accent); background:rgba(79,156,249,.06); }
   .file-drop input { display:none; }
   .danger-zone { border:1px solid var(--red); border-radius:var(--radius); padding:18px; margin-top:24px; background:rgba(248,113,113,.05); }
+
+  /* ===================== DIET & EXCEL TRACKER ===================== */
+  .diet-timeline { position: relative; border-left: 2px solid var(--border); margin: 16px 0 16px 12px; padding-left: 20px; }
+  .diet-time-item { position: relative; margin-bottom: 22px; }
+  .diet-time-dot { position: absolute; left: -27px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent2); border: 2px solid var(--bg2); }
+  .diet-time-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: var(--text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .diet-time-sub { font-size: 12px; color: var(--text2); margin-top: 4px; line-height: 1.5; }
+  .routine-badge { background: rgba(52,211,153,.15); color: var(--accent2); padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; font-family: 'DM Sans', sans-serif; }
+
+  /* Skincare Cards */
+  .skincare-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; position: relative; overflow: hidden; }
+  .skincare-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
+  .skincare-step { display: flex; align-items: flex-start; gap: 10px; margin-top: 10px; font-size: 12px; color: var(--text2); }
+  .skincare-step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--bg3); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0; }
+
+  /* EXCEL SPREADSHEET TRACKER */
+  .excel-wrapper { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .excel-toolbar { background: var(--bg3); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .excel-formula-bar { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 12px; display: flex; align-items: center; gap: 10px; font-family: 'DM Sans', monospace; font-size: 12px; width: 100%; margin-bottom: 10px; }
+  .excel-formula-icon { color: var(--accent3); font-weight: 800; font-style: italic; font-family: serif; font-size: 14px; }
+  .excel-cell-ref { color: var(--accent); font-weight: 700; border-right: 1px solid var(--border); padding-right: 8px; min-width: 45px; }
+
+  .excel-grid-container { max-height: 640px; overflow: auto; position: relative; }
+  .excel-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
+  .excel-table th { background: var(--bg3); color: var(--text2); font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 10px 12px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); position: sticky; top: 0; z-index: 20; text-align: center; white-space: nowrap; }
+  .excel-table th:first-child { position: sticky; left: 0; z-index: 30; background: var(--bg3); }
+  .excel-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--text); background: var(--card); transition: background .15s; }
+  .excel-table td.sticky-col { position: sticky; left: 0; z-index: 10; background: var(--bg2); font-weight: 700; text-align: left; border-right: 2px solid var(--border); white-space: nowrap; }
+  .excel-table tr:hover td { background: rgba(79,156,249,.06); }
+  .excel-table tr:hover td.sticky-col { background: var(--bg3); }
+
+  /* Interactive Cell States */
+  .excel-cell-check { cursor: pointer; user-select: none; font-weight: 800; font-size: 13px; border-radius: 4px; transition: all .15s; }
+  .excel-cell-check.done { background: rgba(34,197,94,.22) !important; color: var(--green) !important; text-shadow: 0 0 4px rgba(34,197,94,.4); }
+  .excel-cell-check.pending { color: var(--text3); }
+  .excel-cell-check.pending:hover { background: rgba(255,255,255,.05); color: var(--text2); }
+
+  /* Formula / Progress Cell */
+  .excel-pct-cell { font-weight: 700; font-family: 'Syne', sans-serif; }
+  .excel-pct-bar { height: 4px; background: var(--bg3); border-radius: 99px; overflow: hidden; margin-top: 3px; }
+  .excel-pct-fill { height: 100%; background: var(--accent2); transition: width .3s; }
 </style>
 </head>
 <body>
@@ -224,6 +265,8 @@
   <button id="theme-toggle" class="btn btn-outline btn-sm" style="margin-left:8px">🌙</button>
   <div class="nav-tab active" onclick="showTab('dashboard')">📊 Dashboard</div>
   <div class="nav-tab" onclick="showTab('plan')">📅 Study Plan</div>
+  <div class="nav-tab" onclick="showTab('diet')">🥗 Diet & Routine</div>
+  <div class="nav-tab" onclick="showTab('diet-excel')">📊 90-Day Diet Sheet</div>
   <div class="nav-tab" onclick="showTab('progress')">✅ Progress</div>
   <div class="nav-tab" onclick="showTab('calendar')">🗓 Calendar</div>
   <div class="nav-tab" onclick="showTab('tests')">📝 Tests</div>
@@ -315,7 +358,294 @@
     </div>
   </div>
   <div id="plan-week-banner"></div>
-  <div class="day-grid" id="plan-days"></div>
+</div>
+
+<!-- ===================== DIET & ROUTINE ===================== -->
+<div id="tab-diet" class="tab-content">
+  <div class="section-header">
+    <div>
+      <div class="section-title">🥗 Daily Diet, Skincare & Life Routine</div>
+      <div class="section-sub">Synchronized healthy lifestyle schedule with regular workout timings, sleep timers & face care</div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="showTab('diet-excel')">📊 Open 90-Day Excel Sheet</button>
+    </div>
+  </div>
+
+  <!-- STATS & TIMERS ROW -->
+  <div class="grid4" style="margin-bottom:20px;">
+    <!-- Sleep Timer Card -->
+    <div class="card" style="border-left: 4px solid #818cf8;">
+      <div class="card-title">😴 Sleep Timer & Schedule</div>
+      <div class="card-value" style="font-size:22px;" id="sleep-timer-val">10:30 PM - 6:30 AM</div>
+      <div class="card-sub" id="sleep-timer-status">Target: 8h Sleep | Status: Ready</div>
+      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-sm btn-outline" id="sleep-timer-btn" onclick="toggleSleepTimer()">🌙 Start Bedtime</button>
+        <button class="btn btn-sm btn-outline" onclick="logSleepManual()">✏️ Log Hours</button>
+      </div>
+    </div>
+
+    <!-- Hydration Card -->
+    <div class="card" style="border-left: 4px solid #38bdf8;">
+      <div class="card-title">💧 Daily Hydration</div>
+      <div class="card-value" style="font-size:22px;"><span id="water-glasses-count">0</span> / 8 <span style="font-size:14px;color:var(--text2)">Glasses</span></div>
+      <div class="card-sub">Target: 3.5 Liters Water</div>
+      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-sm btn-primary" onclick="addWaterGlass()">+1 Glass 💧</button>
+        <button class="btn btn-sm btn-outline" onclick="resetWaterGlass()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Workout & Walk Card -->
+    <div class="card" style="border-left: 4px solid #34d399;">
+      <div class="card-title">🏋️ Workout & Walking</div>
+      <div class="card-value" style="font-size:22px;">95 <span style="font-size:14px;color:var(--text2)">Mins Goal</span></div>
+      <div class="card-sub">Morning Workout + 50m Walking</div>
+      <div style="margin-top:12px;">
+        <span class="tag tag-green">Workout 45m</span> <span class="tag tag-blue">Walk 50m</span>
+      </div>
+    </div>
+
+    <!-- Daily Skincare Card -->
+    <div class="card" style="border-left: 4px solid #f472b6;">
+      <div class="card-title">✨ Face Care Routine</div>
+      <div class="card-value" style="font-size:22px;">2 <span style="font-size:14px;color:var(--text2)">Sessions</span></div>
+      <div class="card-sub">Morning Protection & Night Repair</div>
+      <div style="margin-top:12px;">
+        <span class="tag tag-amber">AM Skincare</span> <span class="tag tag-blue">PM Skincare</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN MASTER SCHEDULE TIMELINE & MEAL PLAN GRID -->
+  <div class="grid2" style="margin-bottom:24px;">
+    <!-- LEFT: Chronological Master Routine Timeline -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px;">⏱️ Master Daily Life Schedule</div>
+      <div class="diet-timeline">
+
+        <div class="diet-time-item">
+          <div class="diet-time-dot"></div>
+          <div class="diet-time-title">6:00 AM – 6:30 AM <span class="routine-badge">Wake-up & Warm Water</span></div>
+          <div class="diet-time-sub">Wake up naturally, stop sleep timer, drink 500ml warm water with lemon/chia seeds for digestion & metabolism.</div>
+        </div>
+
+        <div class="diet-time-item">
+          <div class="diet-time-dot" style="background:#34d399"></div>
+          <div class="diet-time-title">6:30 AM – 7:15 AM <span class="routine-badge" style="background:rgba(52,211,153,.2);color:#34d399">🏋️ Morning Workout</span></div>
+          <div class="diet-time-sub">45 Minutes regular workout / yoga / bodyweight training / cardio session. Elevates energy and focus for the day.</div>
+        </div>
+
+        <div class="diet-time-item">
+          <div class="diet-time-dot" style="background:#f472b6"></div>
+          <div class="diet-time-title">7:15 AM – 7:35 AM <span class="routine-badge" style="background:rgba(244,114,182,.2);color:#f472b6">✨ AM Face Care Routine</span></div>
+          <div class="diet-time-sub">Post-workout freshen up: 1. Gentle Face Wash → 2. Hydration Toner → 3. Vitamin C Serum → 4. Lightweight Moisturizer → 5. Broad Spectrum Sunscreen (SPF 50).</div>
+        </div>
+
+        <div class="diet-time-item">
+          <div class="diet-time-dot" style="background:#38bdf8"></div>
+          <div class="diet-time-title">7:35 AM – 8:05 AM <span class="routine-badge" style="background:rgba(56,189,248,.2);color:#38bdf8">🚶 Morning Walk (30 mins)</span></div>
+          <div class="diet-time-sub">30-minute brisk walk outdoors in fresh air & sunlight. Great for Vitamin D synthesis and circulation.</div>
+        </div>
+
+        <div class="diet-time-item">
+          <div class="diet-time-dot" style="background:#f59e0b"></div>
+          <div class="diet-time-title">8:05 AM – 8:30 AM <span class="routine-badge" style="background:rgba(245,158,11,.2);color:#f59e0b">🥗 Healthy Breakfast</span></div>
+          <div class="diet-time-sub">High protein & fiber breakfast: Oatmeal with fruits & nuts / Boiled Eggs / Vegetable Poha with Sprouts + Green Tea.</div>
+        </div>
+
+        <div class="diet-time-item">
+          <div class="diet-time-dot" style="background:#f59e0b"></div>
+          <div class="diet-time-title">1:00 PM – 1:45 PM <span class="routine-badge" style="background:rgba(245,158,11,.2);color:#f59e0b">🍲 Balanced Lunch</span></div>
+          <div class="diet-time-sub">Nutritious meal: Brown Rice/Roti + Dal/Paneer/Chicken + Fresh Green Salad + Bowl of Curd/Probiotic.</div>
+        </div>
+
+        <div class="diet-time-item">
+          <div class="diet-time-dot" style="background:#38bdf8"></div>
+          <div class="diet-time-title">1:45 PM – 2:05 PM <span class="routine-badge" style="background:rgba(56,189,248,.2);color:#38bdf8">🚶 Post-Lunch Walk (15 mins)</span></div>
+          <div class="diet-time-sub">15-minute light stroll to prevent post-lunch sluggishness and regulate blood sugar.</div>
+        </div>
+
+        <div class="diet-time-item">
+          <div class="diet-time-dot" style="background:#a855f7"></div>
+          <div class="diet-time-title">4:30 PM – 5:00 PM <span class="routine-badge" style="background:rgba(168,85,247,.2);color:#c084fc">🥜 Evening Healthy Snack</span></div>
+          <div class="diet-time-sub">Handful of almonds & walnuts / Roasted makhana / Fruit + Herbal tea or Coconut Water.</div>
+        </div>
+
+        <div class="diet-time-item">
+          <div class="diet-time-dot" style="background:#34d399"></div>
+          <div class="diet-time-title">6:30 PM – 7:15 PM <span class="routine-badge" style="background:rgba(52,211,153,.2);color:#34d399">🏋️ Evening Exercise / Gym</span></div>
+          <div class="diet-time-sub">Evening stretching, resistance training, or sports session to destress.</div>
+        </div>
+
+        <div class="diet-time-item">
+          <div class="diet-time-dot" style="background:#f59e0b"></div>
+          <div class="diet-time-title">8:00 PM – 8:45 PM <span class="routine-badge" style="background:rgba(245,158,11,.2);color:#f59e0b">🥗 Light Healthy Dinner</span></div>
+          <div class="diet-time-sub">Light dinner before 8:45 PM: Vegetable Soup + Grilled Paneer/Tofu/Fish + Sauteed Greens. Low carb for deep sleep.</div>
+        </div>
+
+        <div class="diet-time-item">
+          <div class="diet-time-dot" style="background:#38bdf8"></div>
+          <div class="diet-time-title">8:45 PM – 9:05 PM <span class="routine-badge" style="background:rgba(56,189,248,.2);color:#38bdf8">🚶 Post-Dinner Walk (20 mins)</span></div>
+          <div class="diet-time-sub">20-minute relaxing walk under stars for smooth digestion and calmness.</div>
+        </div>
+
+        <div class="diet-time-item">
+          <div class="diet-time-dot" style="background:#f472b6"></div>
+          <div class="diet-time-title">9:45 PM – 10:15 PM <span class="routine-badge" style="background:rgba(244,114,182,.2);color:#f472b6">🌙 Night Face Care & Wind Down</span></div>
+          <div class="diet-time-sub">1. Mild Cleanser → 2. Soothing Toner → 3. Niacinamide/Retinol Serum → 4. Hydrating Night Cream → 5. Lip Balm.</div>
+        </div>
+
+        <div class="diet-time-item">
+          <div class="diet-time-dot" style="background:#818cf8"></div>
+          <div class="diet-time-title">10:15 PM – 10:30 PM <span class="routine-badge" style="background:rgba(129,140,248,.2);color:#818cf8">😴 Bedtime & Sleep Timer Set</span></div>
+          <div class="diet-time-sub">Turn off screens, set sleep timer, read 10 mins, lights out by 10:30 PM for 8 hours restful sleep.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: Skincare & Diet Guide Details -->
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      
+      <!-- Skincare Details Card -->
+      <div class="skincare-card">
+        <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:16px; margin-bottom:8px;">✨ Face Care Routine Guide</div>
+        <div style="font-size:12px; color:var(--text2); margin-bottom:12px;">Follow this dermatologist-approved skincare workflow for clean, glowing skin:</div>
+        
+        <div style="font-weight:700; font-size:13px; color:var(--accent); margin-bottom:6px;">☀️ Morning Skincare (Protection):</div>
+        <div class="skincare-step"><div class="skincare-step-num">1</div><div><strong>Cleansing:</strong> Gentle sulphate-free face wash with lukewarm water.</div></div>
+        <div class="skincare-step"><div class="skincare-step-num">2</div><div><strong>Antioxidant:</strong> Vitamin C Serum (5-10 drops) for brightening & protection.</div></div>
+        <div class="skincare-step"><div class="skincare-step-num">3</div><div><strong>Hydration:</strong> Gel or light cream moisturizer with Hyaluronic Acid.</div></div>
+        <div class="skincare-step"><div class="skincare-step-num">4</div><div><strong>Protection:</strong> Broad Spectrum Sunscreen SPF 50 PA++++ (re-apply outdoors).</div></div>
+
+        <div style="font-weight:700; font-size:13px; color:#f472b6; margin-top:16px; margin-bottom:6px;">🌙 Night Skincare (Cellular Repair):</div>
+        <div class="skincare-step"><div class="skincare-step-num">1</div><div><strong>Double Cleanse:</strong> Micellar water / cleansing balm to remove dirt & sunscreen, then gentle wash.</div></div>
+        <div class="skincare-step"><div class="skincare-step-num">2</div><div><strong>Repair Serum:</strong> Niacinamide (5%) or Retinol (0.3%) for texture & skin barrier repair.</div></div>
+        <div class="skincare-step"><div class="skincare-step-num">3</div><div><strong>Nourishing Night Cream:</strong> Ceramides & Peptide rich cream to lock in moisture overnight.</div></div>
+        <div class="skincare-step"><div class="skincare-step-num">4</div><div><strong>Lip Care:</strong> Hydrating lip butter + under-eye hydration gel.</div></div>
+      </div>
+
+      <!-- Diet & Meal Plan Options -->
+      <div class="card">
+        <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:16px; margin-bottom:12px;">🥗 Healthy Diet Meal Guide</div>
+        
+        <div style="margin-bottom:12px;">
+          <div style="font-weight:700; font-size:13px; color:var(--accent3); margin-bottom:4px;">🥣 Breakfast Options (Choose 1):</div>
+          <div style="font-size:12px; color:var(--text2); line-height:1.5;">
+            • Rolled Oats cooked in milk/water topped with chia seeds, almonds & berries.<br>
+            • 3 Boiled Egg Whites + 1 Whole Egg + 2 slices Whole Wheat Toast.<br>
+            • Sprouted Moong / Chana salad with onions, tomatoes, lemon juice & paneer cubes.
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <div style="font-weight:700; font-size:13px; color:var(--green); margin-bottom:4px;">🍲 Lunch Options (Choose 1):</div>
+          <div style="font-size:12px; color:var(--text2); line-height:1.5;">
+            • 1 cup Brown Rice / 2 Multigrain Rotis + 1 bowl Arhar/Moong Dal + Sauteed Veggies + Green Salad + Curd.<br>
+            • Grilled Paneer / Chicken Breast bowl with quinoa, steamed broccoli & cucumber salad.
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <div style="font-weight:700; font-size:13px; color:var(--blue); margin-bottom:4px;">🥗 Dinner Options (Choose 1):</div>
+          <div style="font-size:12px; color:var(--text2); line-height:1.5;">
+            • Mixed Vegetable Soup + 100g Grilled Tofu/Paneer/Fish + Green Beans.<br>
+            • Bottle Gourd (Lauki) or Spinach Dal + 1 Roti + Fresh Salad.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 90-DAY DIET SHEET (EXCEL GRID) ===================== -->
+<div id="tab-diet-excel" class="tab-content">
+  <div class="section-header">
+    <div>
+      <div class="section-title">📊 90-Day Diet & Life Routine Checklist (Excel Spreadsheet)</div>
+      <div class="section-sub">Interactive grid tracker: click any cell to mark habit follow-up. Auto-calculates stats & progress!</div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="exportDietExcelCSV()">📥 Export Excel (CSV)</button>
+      <button class="btn btn-outline" onclick="showTab('diet')">🥗 View Routine Details</button>
+    </div>
+  </div>
+
+  <!-- EXCEL SPREADSHEET WRAPPER -->
+  <div class="excel-wrapper">
+    <!-- EXCEL TOOLBAR & FORMULA BAR -->
+    <div class="excel-toolbar">
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <select class="select-styled" id="excel-week-filter" style="padding:6px 12px; font-size:12px;" onchange="renderDietExcelTab()">
+          <option value="all">📅 Show All 90 Days</option>
+          <option value="1">Week 1 (Days 1–7)</option>
+          <option value="2">Week 2 (Days 8–14)</option>
+          <option value="3">Week 3 (Days 15–21)</option>
+          <option value="4">Week 4 (Days 22–28)</option>
+          <option value="5">Week 5 (Days 29–35)</option>
+          <option value="6">Week 6 (Days 36–42)</option>
+          <option value="7">Week 7 (Days 43–49)</option>
+          <option value="8">Week 8 (Days 50–56)</option>
+          <option value="9">Week 9 (Days 57–63)</option>
+          <option value="10">Week 10 (Days 64–70)</option>
+          <option value="11">Week 11 (Days 71–77)</option>
+          <option value="12">Week 12 (Days 78–84)</option>
+          <option value="13">Week 13 (Days 85–90)</option>
+        </select>
+
+        <input class="form-input" id="excel-search" placeholder="🔍 Search Day..." style="padding:6px 10px; font-size:12px; width:140px;" oninput="renderDietExcelTab()">
+
+        <div style="font-size:12px; color:var(--text2);">
+          Filter: 
+          <button class="btn btn-sm btn-outline" style="padding:3px 8px; font-size:11px;" onclick="setExcelFilter('all')">All</button>
+          <button class="btn btn-sm btn-outline" style="padding:3px 8px; font-size:11px;" onclick="setExcelFilter('pending')">Pending</button>
+          <button class="btn btn-sm btn-outline" style="padding:3px 8px; font-size:11px;" onclick="setExcelFilter('completed')">Completed</button>
+        </div>
+      </div>
+
+      <div style="font-size:12px; color:var(--text2);" id="excel-stats-summary">
+        Total Habits: <strong>0 / 900</strong> (0%)
+      </div>
+    </div>
+
+    <!-- FORMULA BAR -->
+    <div style="padding:8px 16px 0;">
+      <div class="excel-formula-bar">
+        <span class="excel-formula-icon">fx</span>
+        <span class="excel-cell-ref" id="excel-active-cell">A1</span>
+        <span style="color:var(--text2);" id="excel-formula-val">=SUM(Habits_Completed) / Total_Routine_Habits * 100</span>
+      </div>
+    </div>
+
+    <!-- EXCEL GRID TABLE -->
+    <div class="excel-grid-container">
+      <table class="excel-table" id="excel-tracker-table">
+        <thead>
+          <tr>
+            <th style="min-width:110px;">Day #</th>
+            <th style="min-width:100px;">Date</th>
+            <th style="min-width:90px;" title="8 Hours Sleep Target">😴 8h Sleep</th>
+            <th style="min-width:95px;" title="Morning Exercise / Workout">🏋️ Workout</th>
+            <th style="min-width:100px;" title="Morning Skincare Routine">✨ AM Skincare</th>
+            <th style="min-width:95px;" title="30 Minutes Morning Walk">🚶 AM Walk</th>
+            <th style="min-width:95px;" title="Healthy High Protein Breakfast">🥗 Breakfast</th>
+            <th style="min-width:95px;" title="Nutritious Balanced Lunch">🍲 Lunch</th>
+            <th style="min-width:95px;" title="20 Minutes Evening Walk">🚶 PM Walk</th>
+            <th style="min-width:95px;" title="Healthy Light Dinner">🥗 Dinner</th>
+            <th style="min-width:105px;" title="Night Skincare & Repair">🌙 PM Skincare</th>
+            <th style="min-width:95px;" title="8+ Water Glasses">💧 8+ Water</th>
+            <th style="min-width:110px;">Progress %</th>
+            <th style="min-width:100px;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="excel-tbody">
+          <!-- Rows rendered dynamically by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <!-- ===================== PROGRESS ===================== -->
@@ -642,6 +972,7 @@ function load(k,def){ try{const v=localStorage.getItem(k);return v?JSON.parse(v)
 function save(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
 
 let progress = load('ngp_progress',{});  // {dayNum: {checks:[false,false,false,false],hours:7,notes:''}}
+let dietProgress = load('ngp_diet_progress',{}); // {dayNum: {sleep:bool,workout:bool,faceCareAM:bool,walkAM:bool,breakfast:bool,lunch:bool,walkPM:bool,dinner:bool,faceCarePM:bool,water:bool,sleepHours:8,waterCount:0}}
 let tests = load('ngp_tests',[]);
 let revisions = load('ngp_revisions',{}); // {unitIdx:{r1,r2,r3}}
 
@@ -664,23 +995,270 @@ function dayDate(dayNum){
 function fmtDate(d){ return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); }
 
 // ============================================================
+// DIET & EXCEL TRACKER LOGIC
+// ============================================================
+let sleepTimerRunning = false;
+let sleepTimerStart = null;
+let excelFilterStatus = 'all';
+
+function getDietDayProgress(d) {
+  const def = {
+    sleep: false,
+    workout: false,
+    faceCareAM: false,
+    walkAM: false,
+    breakfast: false,
+    lunch: false,
+    walkPM: false,
+    dinner: false,
+    faceCarePM: false,
+    water: false,
+    sleepHours: 8,
+    waterCount: 0
+  };
+  return Object.assign({}, def, dietProgress[d] || {});
+}
+
+function toggleDietCheck(d, habitKey) {
+  if (!dietProgress[d]) dietProgress[d] = getDietDayProgress(d);
+  dietProgress[d][habitKey] = !dietProgress[d][habitKey];
+  save('ngp_diet_progress', dietProgress);
+  renderDietTab();
+  renderDietExcelTab();
+  if (window.cloudPush) window.cloudPush();
+}
+
+function markDietDayAll(d, state) {
+  if (!dietProgress[d]) dietProgress[d] = getDietDayProgress(d);
+  const keys = ['sleep','workout','faceCareAM','walkAM','breakfast','lunch','walkPM','dinner','faceCarePM','water'];
+  keys.forEach(k => dietProgress[d][k] = state);
+  save('ngp_diet_progress', dietProgress);
+  renderDietTab();
+  renderDietExcelTab();
+  showToast(`Day ${d} habits marked ${state ? 'Complete' : 'Pending'}`);
+  if (window.cloudPush) window.cloudPush();
+}
+
+function addWaterGlass() {
+  const d = currentDay();
+  if (!dietProgress[d]) dietProgress[d] = getDietDayProgress(d);
+  dietProgress[d].waterCount = (dietProgress[d].waterCount || 0) + 1;
+  if (dietProgress[d].waterCount >= 8) dietProgress[d].water = true;
+  save('ngp_diet_progress', dietProgress);
+  renderDietTab();
+  renderDietExcelTab();
+  showToast(`Water logged: ${dietProgress[d].waterCount}/8 glasses 💧`);
+}
+
+function resetWaterGlass() {
+  const d = currentDay();
+  if (!dietProgress[d]) dietProgress[d] = getDietDayProgress(d);
+  dietProgress[d].waterCount = 0;
+  dietProgress[d].water = false;
+  save('ngp_diet_progress', dietProgress);
+  renderDietTab();
+  renderDietExcelTab();
+}
+
+function toggleSleepTimer() {
+  const btn = document.getElementById('sleep-timer-btn');
+  const status = document.getElementById('sleep-timer-status');
+  if (!sleepTimerRunning) {
+    sleepTimerRunning = true;
+    sleepTimerStart = Date.now();
+    btn.textContent = '☀️ Stop / Wake Up';
+    btn.className = 'btn btn-sm btn-primary';
+    status.textContent = '🌙 Sleep Timer active (Started: ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) + ')';
+    showToast('Sleep Timer Started! Goodnight 🌙');
+  } else {
+    sleepTimerRunning = false;
+    const hrs = ((Date.now() - sleepTimerStart) / (1000 * 60 * 60)).toFixed(1);
+    btn.textContent = '🌙 Start Bedtime';
+    btn.className = 'btn btn-sm btn-outline';
+    status.textContent = `Target: 8h Sleep | Last Logged: ${hrs}h`;
+    const d = currentDay();
+    if (!dietProgress[d]) dietProgress[d] = getDietDayProgress(d);
+    dietProgress[d].sleepHours = parseFloat(hrs);
+    dietProgress[d].sleep = parseFloat(hrs) >= 6.5;
+    save('ngp_diet_progress', dietProgress);
+    renderDietTab();
+    renderDietExcelTab();
+    showToast(`Good morning! Logged ${hrs}h sleep ☀️`);
+  }
+}
+
+function logSleepManual() {
+  const h = prompt('Enter sleep duration in hours (e.g. 7.5 or 8):', '8');
+  if (h === null) return;
+  const num = parseFloat(h) || 0;
+  const d = currentDay();
+  if (!dietProgress[d]) dietProgress[d] = getDietDayProgress(d);
+  dietProgress[d].sleepHours = num;
+  dietProgress[d].sleep = num >= 6.5;
+  save('ngp_diet_progress', dietProgress);
+  renderDietTab();
+  renderDietExcelTab();
+  showToast(`Logged ${num}h sleep`);
+}
+
+function renderDietTab() {
+  const d = currentDay();
+  const dp = getDietDayProgress(d);
+  const wEl = document.getElementById('water-glasses-count');
+  if (wEl) wEl.textContent = dp.waterCount || 0;
+}
+
+function setExcelFilter(filter) {
+  excelFilterStatus = filter;
+  renderDietExcelTab();
+}
+
+function renderDietExcelTab() {
+  const tbody = document.getElementById('excel-tbody');
+  if (!tbody) return;
+  
+  const weekVal = document.getElementById('excel-week-filter')?.value || 'all';
+  const searchVal = (document.getElementById('excel-search')?.value || '').toLowerCase().trim();
+
+  let totalHabitsDone = 0;
+  const keys = ['sleep','workout','faceCareAM','walkAM','breakfast','lunch','walkPM','dinner','faceCarePM','water'];
+  
+  for(let i=1; i<=90; i++) {
+    const dp = getDietDayProgress(i);
+    keys.forEach(k => { if(dp[k]) totalHabitsDone++; });
+  }
+
+  const overallPct = Math.round((totalHabitsDone / 900) * 100);
+  const summaryEl = document.getElementById('excel-stats-summary');
+  if (summaryEl) {
+    summaryEl.innerHTML = `Total Habits Tracked: <strong style="color:var(--green)">${totalHabitsDone} / 900</strong> (${overallPct}%)`;
+  }
+
+  tbody.innerHTML = '';
+
+  for (let i = 1; i <= 90; i++) {
+    const weekNum = Math.floor((i - 1) / 7) + 1;
+    if (weekVal !== 'all' && parseInt(weekVal) !== weekNum) continue;
+
+    const dt = dayDate(i);
+    const dateStr = fmtDate(dt);
+    const dp = getDietDayProgress(i);
+
+    let dayDoneCount = 0;
+    keys.forEach(k => { if(dp[k]) dayDoneCount++; });
+    const dayPct = Math.round((dayDoneCount / keys.length) * 100);
+
+    if (excelFilterStatus === 'completed' && dayPct < 100) continue;
+    if (excelFilterStatus === 'pending' && dayPct === 100) continue;
+
+    if (searchVal) {
+      const rowText = `day ${i} week ${weekNum} ${dateStr}`.toLowerCase();
+      if (!rowText.includes(searchVal)) continue;
+    }
+
+    const isToday = i === currentDay();
+
+    const makeCell = (key, label) => {
+      const isDone = dp[key];
+      return `<td class="excel-cell-check ${isDone ? 'done' : 'pending'}" 
+                  onclick="toggleDietCheck(${i}, '${key}')" 
+                  onmouseover="setFormulaBar('Cell D${i}_${key}', 'Habit: ${label} -> ${isDone ? 'DONE (1)' : 'PENDING (0)'}')"
+                  title="${label}: Click to toggle">
+                ${isDone ? '✓' : '—'}
+              </td>`;
+    };
+
+    const isAllDone = dayPct === 100;
+
+    tbody.innerHTML += `
+      <tr style="${isToday ? 'outline:2px solid var(--accent);' : ''}">
+        <td class="sticky-col">
+          <strong>Day ${i}</strong> ${isToday ? '<span class="tag tag-blue" style="font-size:9px;padding:1px 5px">Today</span>' : ''}
+          <div style="font-size:10px;color:var(--text2);font-weight:normal">Wk ${weekNum}</div>
+        </td>
+        <td style="white-space:nowrap;font-size:11px;color:var(--text2);">${dateStr}</td>
+        ${makeCell('sleep', '8h Sleep Target')}
+        ${makeCell('workout', 'Morning Workout')}
+        ${makeCell('faceCareAM', 'AM Skincare')}
+        ${makeCell('walkAM', 'Morning Walk')}
+        ${makeCell('breakfast', 'Healthy Breakfast')}
+        ${makeCell('lunch', 'Balanced Lunch')}
+        ${makeCell('walkPM', 'Evening Walk')}
+        ${makeCell('dinner', 'Healthy Dinner')}
+        ${makeCell('faceCarePM', 'PM Skincare')}
+        ${makeCell('water', '8+ Water Glasses')}
+        <td class="excel-pct-cell">
+          <span style="color:${dayPct === 100 ? 'var(--green)' : dayPct >= 50 ? 'var(--accent3)' : 'var(--text2)'}">${dayPct}%</span>
+          <div class="excel-pct-bar"><div class="excel-pct-fill" style="width:${dayPct}%;background:${dayPct===100?'var(--green)':'var(--accent)'}"></div></div>
+        </td>
+        <td>
+          <button class="btn btn-sm ${isAllDone ? 'btn-outline' : 'btn-primary'}" 
+                  style="font-size:10px;padding:2px 6px;" 
+                  onclick="markDietDayAll(${i}, ${!isAllDone})">
+            ${isAllDone ? 'Reset' : 'Check All'}
+          </button>
+        </td>
+      </tr>
+    `;
+  }
+}
+
+function setFormulaBar(cellRef, valText) {
+  const refEl = document.getElementById('excel-active-cell');
+  const valEl = document.getElementById('excel-formula-val');
+  if (refEl) refEl.textContent = cellRef;
+  if (valEl) valEl.textContent = valText;
+}
+
+function exportDietExcelCSV() {
+  let csv = 'Day,Date,Week,8h Sleep,Workout,AM Skincare,AM Walk,Breakfast,Lunch,PM Walk,Dinner,PM Skincare,Water,Completion %\n';
+  const keys = ['sleep','workout','faceCareAM','walkAM','breakfast','lunch','walkPM','dinner','faceCarePM','water'];
+
+  for (let i = 1; i <= 90; i++) {
+    const weekNum = Math.floor((i - 1) / 7) + 1;
+    const dt = fmtDate(dayDate(i));
+    const dp = getDietDayProgress(i);
+
+    let count = 0;
+    const vals = keys.map(k => {
+      if (dp[k]) count++;
+      return dp[k] ? 'YES' : 'NO';
+    });
+
+    const pct = Math.round((count / keys.length) * 100) + '%';
+    csv += `${i},"${dt}",${weekNum},${vals.join(',')},${pct}\n`;
+  }
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `90_day_diet_routine_tracker_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Diet Excel Sheet CSV downloaded!');
+}
+
+// ============================================================
 // TABS
 // ============================================================
 function showTab(name){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
+  const el = document.getElementById('tab-'+name);
+  if(el) el.classList.add('active');
   
   // Find matching nav element manually to work without inline event
   const tabs = document.querySelectorAll('.nav-tab');
   tabs.forEach(tab => {
-    if(tab.getAttribute('onclick').includes(name)){
+    if(tab.getAttribute('onclick') && tab.getAttribute('onclick').includes(`'${name}'`)){
       tab.classList.add('active');
     }
   });
 
   if(name==='dashboard') renderDashboard();
   if(name==='plan') renderPlan();
+  if(name==='diet') renderDietTab();
+  if(name==='diet-excel') renderDietExcelTab();
   if(name==='progress') renderProgress();
   if(name==='calendar') renderCalendar();
   if(name==='tests') renderTests();
@@ -1109,6 +1687,8 @@ function renderApp(){
   updateCoreStats();
   renderDashboard();
   renderPlan();
+  renderDietTab();
+  renderDietExcelTab();
   renderProgress();
   renderCalendar();
   renderTests();
@@ -1139,6 +1719,7 @@ function exportBackup(){
     _version: 1,
     _exportedAt: new Date().toISOString(),
     progress: progress,
+    dietProgress: dietProgress,
     tests: tests,
     revisions: revisions,
     currentDay: activeCurrentDay || currentDay(),
@@ -1201,11 +1782,13 @@ function processImportFile(file){
       if(!confirm('This will replace ALL your current progress with the backup data. Continue?')) return;
 
       progress = data.progress || {};
+      dietProgress = data.dietProgress || {};
       tests = data.tests || [];
       revisions = data.revisions || {};
       if(data.currentDay){ activeCurrentDay = data.currentDay; save('ngp_current_day', activeCurrentDay); }
       if(data.startDate){ START_DATE = new Date(data.startDate); save('ngp_start_date', data.startDate); }
       save('ngp_progress', progress);
+      save('ngp_diet_progress', dietProgress);
       save('ngp_tests', tests);
       save('ngp_revisions', revisions);
       renderApp();
@@ -1229,10 +1812,12 @@ function resetAllData(){
   if(!confirm('Are you SURE you want to delete all progress? This cannot be undone!')) return;
   if(!confirm('Really? This will erase everything. Last chance!')) return;
   localStorage.removeItem('ngp_progress');
+  localStorage.removeItem('ngp_diet_progress');
   localStorage.removeItem('ngp_tests');
   localStorage.removeItem('ngp_revisions');
   localStorage.removeItem('ngp_current_day');
   progress = {};
+  dietProgress = {};
   tests = [];
   revisions = {};
   activeCurrentDay = null;
@@ -1306,7 +1891,7 @@ function initDragDrop(){
   let lastPushTime = 0;
 
   function computeLocalHash(){
-    try{ return btoa(unescape(encodeURIComponent(JSON.stringify({progress,tests,revisions})))) }catch(e){ return '' }
+    try{ return btoa(unescape(encodeURIComponent(JSON.stringify({progress,dietProgress,tests,revisions})))) }catch(e){ return '' }
   }
 
   // Listen for remote changes and apply to local state
@@ -1322,11 +1907,13 @@ function initDragDrop(){
 
     // Apply remote data to local app state
     if(data.progress) progress = data.progress;
+    if(data.dietProgress) dietProgress = data.dietProgress;
     if(data.tests) tests = data.tests;
     if(data.revisions) revisions = data.revisions;
     if(data.currentDay) { activeCurrentDay = data.currentDay; save('ngp_current_day', activeCurrentDay); }
     if(data.startDate) { START_DATE = new Date(data.startDate); save('ngp_start_date', data.startDate); }
     save('ngp_progress', progress);
+    save('ngp_diet_progress', dietProgress);
     save('ngp_tests', tests);
     save('ngp_revisions', revisions);
     renderApp();
@@ -1338,6 +1925,7 @@ function initDragDrop(){
     try{
       const payload = {
         progress: progress,
+        dietProgress: dietProgress,
         tests: tests,
         revisions: revisions,
         currentDay: activeCurrentDay || currentDay(),
@@ -1353,7 +1941,7 @@ function initDragDrop(){
   // Expose helpers for manual control
   window.cloudPush = pushToCloud;
   window.cloudPull = async ()=>{
-    try{ const snap = await getDoc(docRef); if(!snap.exists()) return; const d = snap.data(); if(d.progress) progress = d.progress; if(d.tests) tests = d.tests; if(d.revisions) revisions = d.revisions; renderApp(); showToast('Pulled from Firebase'); }catch(e){console.error(e)}
+    try{ const snap = await getDoc(docRef); if(!snap.exists()) return; const d = snap.data(); if(d.progress) progress = d.progress; if(d.dietProgress) dietProgress = d.dietProgress; if(d.tests) tests = d.tests; if(d.revisions) revisions = d.revisions; renderApp(); showToast('Pulled from Firebase'); }catch(e){console.error(e)}
   };
 
   // Auto-detect local changes and push periodically
