@@ -450,20 +450,20 @@
 
         <div class="diet-time-item">
           <div class="diet-time-dot" style="background:#38bdf8"></div>
-          <div class="diet-time-title">9:00 AM – 4:00 PM <span class="routine-badge" style="background:rgba(56,189,248,.2);color:#38bdf8">🎓 College Timing</span></div>
+          <div class="diet-time-title">9:00 AM – 2:00 PM <span class="routine-badge" style="background:rgba(56,189,248,.2);color:#38bdf8">🎓 College Timing</span></div>
           <div class="diet-time-sub">Classes, Lab, and Lunch (1:00 PM) at college. Stay hydrated!</div>
         </div>
 
         <div class="diet-time-item">
           <div class="diet-time-dot" style="background:#a855f7"></div>
-          <div class="diet-time-title">4:30 PM – 5:00 PM <span class="routine-badge" style="background:rgba(168,85,247,.2);color:#c084fc">🥜 Evening Snack & Relax</span></div>
-          <div class="diet-time-sub">Return from college, relax, have a healthy snack.</div>
+          <div class="diet-time-title">2:30 PM – 3:00 PM <span class="routine-badge" style="background:rgba(168,85,247,.2);color:#c084fc">🥜 Evening Snack & Relax</span></div>
+          <div class="diet-time-sub">Return from college, freshen up, have a healthy snack.</div>
         </div>
 
         <div class="diet-time-item">
           <div class="diet-time-dot" style="background:#3b82f6"></div>
-          <div class="diet-time-title">5:00 PM – 7:00 PM <span class="routine-badge" style="background:rgba(59,130,246,.2);color:#3b82f6">📚 Study Session 1 (2 Hours)</span></div>
-          <div class="diet-time-sub">Deep focus study block. Avoid phone distractions.</div>
+          <div class="diet-time-title">3:00 PM – 5:00 PM <span class="routine-badge" style="background:rgba(59,130,246,.2);color:#3b82f6">📚 Study Session 1 (2 Hours)</span></div>
+          <div class="diet-time-sub">Deep focus study block after returning from college.</div>
         </div>
 
         <div class="diet-time-item">
@@ -791,11 +791,22 @@
 // DATA – 90-DAY PLAN (13 weeks syllabus + 1 week PYQ/tests)
 // ============================================================
 let START_DATE = new Date(localStorage.getItem('ngp_start_date') ? JSON.parse(localStorage.getItem('ngp_start_date')) : '2026-06-01');
-let DIET_START_DATE = new Date(localStorage.getItem('ngp_diet_start_date') ? JSON.parse(localStorage.getItem('ngp_diet_start_date')) : START_DATE.toISOString().split('T')[0]);
+
+// Default diet start date to TODAY if never set before
+(function initDietStartDate() {
+  if (!localStorage.getItem('ngp_diet_start_date')) {
+    const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
+    localStorage.setItem('ngp_diet_start_date', JSON.stringify(todayStr));
+  }
+})();
+let DIET_START_DATE = new Date(JSON.parse(localStorage.getItem('ngp_diet_start_date')));
 
 function currentDietDay(){
-  const now = new Date(); 
-  const diff = Math.floor((now - DIET_START_DATE) / (1000*60*60*24));
+  // Use local midnight for both dates to avoid timezone off-by-one
+  const now = new Date();
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startMidnight = new Date(DIET_START_DATE.getFullYear(), DIET_START_DATE.getMonth(), DIET_START_DATE.getDate());
+  const diff = Math.floor((todayMidnight - startMidnight) / (1000*60*60*24));
   return Math.max(1, Math.min(90, diff + 1));
 }
 
